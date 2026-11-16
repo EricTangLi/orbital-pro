@@ -1,0 +1,36 @@
+# Rust 构建产物（spike 的 target 有几百 MB，不入库）
+**/target/
+Cargo.lock.bak
+
+# Tauri 构建期生成
+spike/m1-tauri/gen/
+src-tauri/gen/
+
+# 前端
+node_modules/
+.vite/
+/dist/
+
+# 运行证据（日志与 stdout 捕获；结构化结论写进文档）
+spike/evidence/*.out
+spike/evidence/*.log
+evidence/*.log
+spike/m1-spike/runtime/
+
+# 编辑器/系统
+.DS_Store
+Thumbs.db
+*.swp
+
+# 密钥（仓库外应放 ~/.orbital/secrets.json，这里双保险）
+secrets/
+secrets.json
+*.token
+
+# 绕过 exe 文件锁时的独立构建目录（2026-11-12，约 950MB，可随手删）
+target-mcp/
+# example 跑出来的 journal 文件（不是源码）
+j
+
+# 旧的独立构建目录（曾漏配，947 MB 差点进库）
+target-mcp/

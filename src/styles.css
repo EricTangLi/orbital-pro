@@ -1,0 +1,2968 @@
+@import "tailwindcss";
+
+/*
+ * 设计 token —— 唯一来源是 docs/03-UIUX设计规格.md §3。
+ * 代码里**不许**出现裸色值/裸字号/裸圆角（AGENTS.md 红线 4）。
+ */
+:root {
+  /* ===== 字号阶梯（依据 Awe framework + Precision&Density 的 dashboard 档）=====
+   * 原来 --fs-num 26px 是"拍"的，dashboard 指标 20-24px 足够；标题 18px 也比 20px 更紧凑。 */
+  --fs-2xs: 11px; /* caption / 徽章 / 表头 */
+  --fs-xs: 12px; /* label / 副标题行 */
+  --fs-sm: 13px; /* body（dashboard 主用档） */
+  --fs-md: 13px; /* 与 body 同档，保留旧名以兼容既有类 */
+  --fs-lg: 15px; /* 卡片标题 */
+  --fs-xl: 18px; /* 页面标题（原 20px 偏大） */
+  --fs-num: 21px; /* 指标数字（原 26px 太大） */
+  --fs-display: 28px; /* 唯一的 hero 数字 */
+
+  /* 行高（正文 1.5 / 紧凑 1.35） */
+  --lh-body: 1.55;
+  --lh-tight: 1.35;
+
+  /* ===== 字重（Linear 用 400/510/590，这里取整到 400/500/600）===== */
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+
+  /* ===== 间距：4px 基数 ===== */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  /* 旧名映射（避免大改所有类） */
+  --sp-page: 24px;
+  --sp-card: var(--sp-3);
+  --sp-cell: var(--sp-2);
+
+  /* ===== 圆角（Radix/Linear：控件 4 / 卡片 6）===== */
+  --r-control: 4px;
+  --r-card: 6px;
+  --r-full: 9999px;
+
+  /* ===== 颜色：Radix Colors 12 步（Gray + Indigo + 语义色）=====
+   * 来源：design/ui-hifi-v2.html 原本就是这套；我此前换成了自拼的 #6d4aff，已改回。 */
+  /* Gray：1-2 背景 / 3-5 组件 / 6-8 边框 / 9-10 中性实心 / 11-12 文本 */
+  --gray-1: #fcfcfd;
+  --gray-2: #f9f9fb;
+  --gray-3: #f0f0f3;
+  --gray-4: #e8e8ec;
+  --gray-5: #e0e1e6;
+  --gray-6: #d9d9e0;
+  --gray-7: #cdced6;
+  --gray-8: #b9bbc6;
+  --gray-9: #8b8d98;
+  --gray-10: #80838d;
+  --gray-11: #60646c;
+  --gray-12: #1c2024;
+
+  /* Indigo（品牌强调）：9 实心 / 10 悬停 / 11 文本 / 3 淡底 */
+  --indigo-3: #f0f1fe;
+  --indigo-9: #5b5bd6;
+  --indigo-10: #5151cd;
+  --indigo-11: #5753c6;
+
+  /* 语义色：3 淡底 / 9 实心 / 11 文本 */
+  --green-3: #e6f6eb;
+  --green-9: #30a46c;
+  --green-11: #218358;
+  --amber-3: #fff7c2;
+  --amber-9: #ffc53d;
+  --amber-11: #4f3422;
+  --red-3: #feebec;
+  --red-9: #e5484d;
+  --red-11: #ce2c31;
+  --blue-3: #edf2fe;
+  --blue-9: #3e63dd;
+  --blue-11: #3a5bc7;
+
+  /* ===== 数据系列色（ADR-033 规则 4）=====
+   * 顺序固定、**不许重排**：IBM Carbon categorical 序列要求相邻色对比最大化，
+   * 换个顺序就会出现"相近色挨着"。一张图最多用到 --data-7（超过 7 类要聚合或换图型）。
+   * 语义色（--ok/--warn/--danger/--info）**不参与**数据系列。 */
+  --data-1: #8e4ec6; /* 紫 purple-9 */
+  --data-2: #00a2c7; /* 青 cyan-9 */
+  --data-3: #12a594; /* 青绿 teal-9 */
+  --data-4: #d6409f; /* 洋红 pink-9 */
+  --data-5: var(--red-9);
+  --data-6: var(--green-9);
+  --data-7: var(--blue-9);
+  /* 非强调数据用中性灰——Datawrapper：灰色是数据可视化里最重要的颜色 */
+  --data-muted: var(--gray-8);
+
+  /* ---- 语义别名（类里只用这些，不直接引步阶）---- */
+  --bg-canvas: var(--gray-1);
+  --bg-surface: #ffffff;
+  --bg-sunken: var(--gray-3);
+  --bg-hover: var(--gray-4);
+  --bg-active: var(--gray-5);
+  --border-subtle: var(--gray-6);
+  --border-default: var(--gray-7);
+  --border-strong: var(--gray-8);
+  --text-primary: var(--gray-12);
+  --text-secondary: var(--gray-11);
+  --text-tertiary: var(--gray-9);
+
+  --accent: var(--indigo-9);
+  --accent-hover: var(--indigo-10);
+  --accent-text: var(--indigo-11);
+  --accent-soft: var(--indigo-3);
+
+  --ok: var(--green-11);
+  --ok-soft: var(--green-3);
+  --warn: var(--amber-11);
+  --warn-soft: var(--amber-3);
+  --danger: var(--red-11);
+  --danger-soft: var(--red-3);
+  --info: var(--blue-9);
+  --info-soft: var(--blue-3);
+
+  /* ===== Agent 身份色（同明度、同饱和度档，保证 4 个色协调）=====
+   * 从 Radix 的 9 步取：blue / pink / violet / orange —— 同为 9 步，明度一致。 */
+  --agent-dsh: #3e63dd;
+  --agent-hermes: #d6409f;
+  --agent-pi: #6e56cf;
+  --agent-workbuddy: #f76b15;
+  --agent-dsh-soft: #edf2fe;
+  --agent-hermes-soft: #fdf2f8;
+  --agent-pi-soft: #f4f1fd;
+  --agent-workbuddy-soft: #fff4ec;
+
+  /* ===== 背景：极轻的层，不做"紫光"（Linear 的渐变 <8%，只在 hero）===== */
+  --bg-page: var(--gray-1);
+  --card-shadow: 0 1px 2px rgba(28, 32, 36, 0.04);
+  --shadow-overlay: 0 8px 24px rgba(28, 32, 36, 0.12);
+}
+
+/* 深浅色跟随系统，不做 App 内开关（docs/03 §3.5 / ADR-010） */
+@media (prefers-color-scheme: dark) {
+  :root {
+      /* Radix Dark：1-2 背景 / 3-5 组件 / 6-8 边框 / 9-10 中性 / 11-12 文本 */
+      --gray-1: #111113;
+      --gray-2: #18191b;
+      --gray-3: #212225;
+      --gray-4: #272a2d;
+      --gray-5: #2e3135;
+      --gray-6: #363a3f;
+      --gray-7: #43484e;
+      --gray-8: #5a6169;
+      --gray-9: #696e77;
+      --gray-10: #777b84;
+      --gray-11: #b0b4ba;
+      --gray-12: #edeef0;
+
+      --indigo-3: #202248;
+      --indigo-9: #5b5bd6;
+      --indigo-10: #6e6ade;
+      --indigo-11: #b1a9ff;
+
+      --green-3: #132d21;
+      --green-9: #30a46c;
+      --green-11: #3dd68c;
+      --amber-3: #302008;
+      --amber-9: #ffc53d;
+      --amber-11: #ffca16;
+      --red-3: #3b1219;
+      --red-9: #e5484d;
+      --red-11: #ff9592;
+      --blue-3: #1a2744;
+      --blue-9: #3e63dd;
+      --blue-11: #9eb1ff;
+
+      --bg-canvas: var(--gray-1);
+      --bg-surface: var(--gray-2);
+      --bg-sunken: var(--gray-3);
+      --bg-hover: var(--gray-4);
+      --bg-active: var(--gray-5);
+      --border-subtle: var(--gray-6);
+      --border-default: var(--gray-7);
+      --border-strong: var(--gray-8);
+      --text-primary: var(--gray-12);
+      --text-secondary: var(--gray-11);
+      --text-tertiary: var(--gray-9);
+
+      --accent: var(--indigo-9);
+      --accent-hover: var(--indigo-10);
+      --accent-text: var(--indigo-11);
+      --accent-soft: var(--indigo-3);
+
+      --ok: var(--green-11);
+      --ok-soft: var(--green-3);
+      --warn: var(--amber-11);
+      --warn-soft: var(--amber-3);
+      --danger: var(--red-11);
+      --danger-soft: var(--red-3);
+      --info: var(--blue-9);
+      --info-soft: var(--blue-3);
+
+      --agent-dsh: #7091f0;
+      --agent-hermes: #e58acb;
+      --agent-pi: #a892f0;
+      --agent-workbuddy: #f5a05a;
+      --agent-dsh-soft: #1a2744;
+      --agent-hermes-soft: #2b1c26;
+      --agent-pi-soft: #241f3a;
+      --agent-workbuddy-soft: #2b1f12;
+
+      --bg-page: var(--gray-1);
+      --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --shadow-overlay: 0 8px 24px rgba(0, 0, 0, 0.6);
+    }
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: var(--fs-md);
+  font-weight: var(--fw-normal);
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  padding: var(--sp-page);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-cell);
+  min-height: 100%;
+}
+
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-card);
+  padding: var(--sp-card);
+}
+
+.title {
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-semibold);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.num {
+  font-size: var(--fs-num);
+  font-weight: var(--fw-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.row {
+  display: flex;
+  gap: var(--sp-cell);
+  align-items: center;
+}
+
+.badge {
+  font-size: var(--fs-2xs);
+  border-radius: var(--r-control);
+  padding: 2px 8px;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.badge-ok {
+  color: var(--ok);
+  border-color: currentColor;
+}
+
+.muted {
+  color: var(--text-tertiary);
+  font-size: var(--fs-2xs);
+}
+
+/* 尊重系统"减少动态效果"（docs/03 §6） */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ===== T-M1-13 三进程状态页（只用 token，不用裸值） ===== */
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-card);
+}
+
+.refresh {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-cell);
+}
+
+.btn {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-control);
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.row-between {
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.proc-name {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+}
+
+.num-sub {
+  font-size: var(--fs-md);
+  color: var(--text-tertiary);
+  font-weight: var(--fw-normal);
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-cell);
+  margin-top: var(--sp-cell);
+  padding-top: var(--sp-cell);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.kv-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kv-k {
+  font-size: var(--fs-2xs);
+  color: var(--text-tertiary);
+}
+
+.kv-v {
+  font-size: var(--fs-md);
+  color: var(--text-primary);
+  font-weight: var(--fw-medium);
+  /* 长的 source_ref 路径必须能断行，否则会压到隔壁列（T-M2-01 实测重叠） */
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+
+/* 详情区的元数据在窄栏里 4 列会挤 —— 改成单列（T-M2-01） */
+.detail-pane .kv {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+.mono {
+  font-family: "JetBrains Mono Variable", ui-monospace, monospace;
+}
+
+.err-line {
+  margin-top: var(--sp-cell);
+  font-size: var(--fs-xs);
+  color: var(--danger);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge-danger {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger);
+}
+
+.badge-warn {
+  background: color-mix(in srgb, var(--warn) 14%, transparent);
+  color: var(--warn);
+}
+
+.card-warn {
+  border-color: color-mix(in srgb, var(--warn) 40%, var(--border-subtle));
+}
+
+.card-danger {
+  border-color: color-mix(in srgb, var(--danger) 40%, var(--border-subtle));
+}
+
+/* ============================================================
+ * 记忆总览页（T-M2-01）—— 对齐 docs/03 §4.2 主从双栏
+ * 全部用本文件上方 :root 的 token；本段不出现裸色值/裸字号/裸圆角（红线 4）
+ * ============================================================ */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-card);
+}
+
+.input {
+  font-size: var(--fs-md);
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-control);
+  padding: 6px 10px;
+  font-family: inherit;
+  min-width: 140px;
+}
+
+.input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+
+.filters > .input:first-child {
+  flex: 1 1 240px;
+}
+
+/* 分层卡：可点击过滤（ADR-031：跨表统计，不是 GROUP BY layer） */
+.layers {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-cell);
+}
+
+.layer-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-card);
+  padding: var(--sp-cell);
+}
+
+.layer-card .num {
+  font-size: var(--fs-num);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.layer-active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* 主从双栏 */
+.master-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 4fr);
+  gap: var(--sp-card);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .master-detail {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .layers {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.list-pane,
+.detail-pane {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-cell);
+  min-height: 320px;
+}
+
+.list-head {
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: var(--sp-cell);
+}
+
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.mem-row {
+  padding: 10px 12px;
+  border-radius: var(--r-control);
+  cursor: pointer;
+  border-left: 2px solid transparent;
+}
+
+.mem-row:hover {
+  background: var(--bg-hover);
+}
+
+.mem-row-active {
+  background: var(--accent-soft);
+  border-left-color: var(--accent);
+}
+
+.mem-row-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mem-row-summary {
+  font-size: var(--fs-md);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mem-row-meta {
+  margin-top: 4px;
+}
+
+.empty {
+  font-size: var(--fs-md);
+  color: var(--text-tertiary);
+  padding: var(--sp-card) 0;
+  line-height: 1.6;
+}
+
+.pager {
+  display: flex;
+  gap: var(--sp-cell);
+  justify-content: flex-end;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--sp-cell);
+}
+
+.detail-content {
+  font-size: var(--fs-md);
+  color: var(--text-primary);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--bg-sunken);
+  border-radius: var(--r-control);
+  padding: var(--sp-cell);
+  margin: 0;
+}
+
+.detail-note {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--sp-cell);
+  line-height: 1.6;
+}
+
+@media (prefers-color-scheme: dark) {
+  .layer-active,
+  .mem-row-active {
+    background: var(--accent-soft);
+  }
+}
+
+/* ============================================================
+ * 侧栏 + 总览页（M2 新版界面）
+ * 全部 token，无裸值（红线 4）
+ * ============================================================ */
+
+/* 整体：侧栏 + 主区 */
+.app {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-canvas);
+}
+
+.side {
+  width: 220px;
+  flex: 0 0 220px;
+  background: var(--bg-sunken);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.side-hd {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 14px 14px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.side-hd .mark {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-control);
+  flex: none;
+  color: var(--accent);
+}
+
+.side-hd .nm {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+.side-hd .sub {
+  font-size: var(--fs-2xs);
+  color: var(--text-tertiary);
+  line-height: 1.3;
+}
+
+.side-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.sect {
+  font-size: var(--fs-2xs);
+  color: var(--text-tertiary);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 12px 8px 6px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 8px;
+  border: none;
+  background: transparent;
+  border-radius: var(--r-control);
+  font-size: var(--fs-md);
+  color: var(--text-secondary);
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.item.active {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-weight: var(--fw-medium);
+  box-shadow: 0 0 0 1px var(--border-subtle);
+}
+
+.item .tail {
+  margin-left: auto;
+  font-size: var(--fs-2xs);
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.item .nav-icon {
+  width: 16px;
+  text-align: center;
+  flex: none;
+  opacity: 0.75;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.dot-on {
+  background: var(--ok);
+}
+
+.dot-off {
+  background: var(--border-strong);
+}
+
+.side-ft {
+  border-top: 1px solid var(--border-subtle);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.side-ft .tail {
+  margin-left: auto;
+  font-size: var(--fs-2xs);
+  color: var(--text-tertiary);
+}
+
+/* 主区 */
+.main {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.content {
+  max-width: 1320px;
+  padding: var(--sp-page) 24px 40px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-card);
+}
+
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-card);
+}
+
+.page-head h1 {
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin: 0 0 2px;
+}
+
+.page-head .desc {
+  font-size: var(--fs-md);
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+/* 四个指标 */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-cell);
+}
+
+@media (max-width: 1080px) {
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.stat-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-card);
+  padding: var(--sp-cell);
+  text-align: left;
+  font-family: inherit;
+  cursor: default;
+}
+
+.stat-clickable {
+  cursor: pointer;
+}
+
+.stat-clickable:hover {
+  border-color: var(--accent);
+}
+
+.stat-value {
+  font-size: var(--fs-num);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  font-weight: var(--fw-medium);
+  margin-top: 2px;
+}
+
+.stat-sub {
+  font-size: var(--fs-2xs);
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+.stat-ok .stat-value {
+  color: var(--ok);
+}
+
+.stat-warn .stat-value {
+  color: var(--warn);
+}
+
+.stat-danger .stat-value {
+  color: var(--danger);
+}
+
+/* 两栏 */
+.two-col {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--sp-card);
+}
+
+@media (max-width: 1080px) {
+  .two-col {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-cell);
+  padding-bottom: var(--sp-cell);
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-medium);
+  color: var(--text-primary);
+}
+
+.card-foot {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--sp-cell);
+  line-height: 1.6;
+}
+
+/* 分层条 */
+.layer-row {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-cell);
+  padding: 10px 0;
+}
+
+.layer-name {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.layer-name b {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+}
+
+.layer-bar {
+  height: 6px;
+  border-radius: var(--r-control);
+  background: var(--bg-sunken);
+  overflow: hidden;
+}
+
+.layer-bar i {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-control);
+}
+
+.bar-l0 {
+  background: var(--info);
+}
+
+.bar-l1 {
+  background: var(--accent);
+}
+
+.layer-val {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-medium);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.muted-row {
+  opacity: 0.55;
+}
+
+/* Agent 列表 */
+.agent-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.agent-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+  font-size: var(--fs-md);
+}
+
+.agent-row:last-child {
+  border-bottom: none;
+}
+
+.agent-name {
+  color: var(--text-primary);
+  font-weight: var(--fw-medium);
+  min-width: 92px;
+}
+
+.agent-num {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.agent-last {
+  margin-left: auto;
+}
+
+/* 最近写入 */
+.recent-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.recent-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+  font-size: var(--fs-md);
+}
+
+.recent-row:last-child {
+  border-bottom: none;
+}
+
+.recent-agent {
+  flex: none;
+  font-size: var(--fs-2xs);
+  color: var(--text-tertiary);
+  background: var(--bg-sunken);
+  border-radius: var(--r-control);
+  padding: 1px 6px;
+  min-width: 62px;
+  text-align: center;
+}
+
+.recent-text {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recent-time {
+  flex: none;
+}
+
+/* 表格（连接页） */
+.tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-md);
+}
+
+.tbl th {
+  text-align: left;
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
+  color: var(--text-tertiary);
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  letter-spacing: 0.02em;
+}
+
+.tbl td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+
+.tbl tr:last-child td {
+  border-bottom: none;
+}
+
+.todo-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  font-size: var(--fs-md);
+  color: var(--text-primary);
+}
+
+.btn-sm {
+  padding: 4px 10px;
+  font-size: var(--fs-xs);
+}
+
+/* ============================================================
+ * 精致化层（M2 v2）—— 参考 dsh-context「编队」的多色语言
+ *
+ * 三条原则：
+ * 1. **色彩只用来标识身份**（哪个 agent），不用来做装饰——否则变调色板。
+ * 2. 背景有"层"（渐变辉光），但**卡片仍是清晰的白**，保证可读性。
+ * 3. 所有值来自 :root token（红线 4）。
+ * ============================================================ */
+
+body {
+  background: var(--bg-page);
+  background-attachment: fixed;
+}
+
+.app {
+  background: transparent;
+}
+
+/* 侧栏：实色 + 1px 边界（ADR-033 规则 6：禁用 backdrop-filter）。
+   毛玻璃会让"半透明侧栏 + 背景辉光"叠加成灰雾，是深色主题下最明显的脏感来源。 */
+.side {
+  background: var(--bg-sunken);
+  border-right: 1px solid var(--border-subtle);
+}
+
+/* 卡片统一阴影（比原来"只有 border"更有层次） */
+.card,
+.stat-card {
+  box-shadow: var(--card-shadow);
+}
+
+/* ---- 指标卡：左边条标识语义（不改变数字颜色，避免花）---- */
+.stat-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--border-strong);
+}
+
+.stat-ok::before {
+  background: var(--ok);
+}
+
+.stat-warn::before {
+  background: var(--warn);
+}
+
+.stat-danger::before {
+  background: var(--danger);
+}
+
+.stat-clickable:hover {
+  box-shadow: var(--card-shadow), 0 0 0 1px var(--accent);
+}
+
+/* ---- 侧栏 agent 状态点：用各自专属色（编队语言）---- */
+.item .dot.dot-on[data-agent="dsh"],
+.agent-row[data-agent="dsh"] .dot.dot-on {
+  background: var(--agent-dsh);
+}
+
+.item .dot.dot-on[data-agent="hermes"],
+.agent-row[data-agent="hermes"] .dot.dot-on {
+  background: var(--agent-hermes);
+}
+
+.item .dot.dot-on[data-agent="pi"],
+.agent-row[data-agent="pi"] .dot.dot-on {
+  background: var(--agent-pi);
+}
+
+.item .dot.dot-on[data-agent="workbuddy"],
+.agent-row[data-agent="workbuddy"] .dot.dot-on {
+  background: var(--agent-workbuddy);
+}
+
+/* ---- Agent 行：悬停时左边条亮出该 agent 的颜色 ---- */
+.agent-row {
+  border-left: 2px solid transparent;
+  padding-left: 8px;
+  margin-left: -8px;
+  border-radius: var(--r-control);
+}
+
+.agent-row:hover {
+  background: var(--bg-hover);
+}
+
+.agent-row[data-agent="dsh"]:hover {
+  border-left-color: var(--agent-dsh);
+}
+
+.agent-row[data-agent="hermes"]:hover {
+  border-left-color: var(--agent-hermes);
+}
+
+.agent-row[data-agent="pi"]:hover {
+  border-left-color: var(--agent-pi);
+}
+
+.agent-row[data-agent="workbuddy"]:hover {
+  border-left-color: var(--agent-workbuddy);
+}
+
+/* ---- 最近写入的来源标签：按 agent 上色（软底 + 同色字）---- */
+.recent-agent {
+  font-weight: var(--fw-medium);
+}
+
+.recent-agent[data-agent="dsh"] {
+  background: var(--agent-dsh-soft);
+  color: var(--agent-dsh);
+}
+
+.recent-agent[data-agent="hermes"] {
+  background: var(--agent-hermes-soft);
+  color: var(--agent-hermes);
+}
+
+.recent-agent[data-agent="pi"] {
+  background: var(--agent-pi-soft);
+  color: var(--agent-pi);
+}
+
+.recent-agent[data-agent="workbuddy"] {
+  background: var(--agent-workbuddy-soft);
+  color: var(--agent-workbuddy);
+}
+
+/* ---- 分层条：单色实心（ADR-033 规则 1：数据元素零渐变）----
+   这里曾经用 `linear-gradient(90deg, var(--info), #7aa2ff)` 让条形"看起来是数据"，
+   实测结果是界面发脏：① 双色相渐变在 6px 高度上产生可见色带；② 渐变里的硬编码 hex
+   与 token 体系脱节，浅色/深色主题各错一半；③ 长度已经承载数值，渐变属于重复编码。
+   规范：数据条＝单色 + 长度，颜色只承载类别（Carbon / Datawrapper 一手依据见 ADR-033）。 */
+.layer-bar {
+  position: relative;
+}
+
+/* ---- 记忆列表行：悬停 + 选中都有身份感 ---- */
+.mem-row:hover {
+  background: var(--bg-hover);
+}
+
+.mem-row-active {
+  background: var(--accent-soft, var(--bg-sunken));
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+/* ---- 顶部标题：给一句更有质感的重心 ---- */
+.page-head h1 {
+  letter-spacing: -0.025em;
+}
+
+/* ===== 删除确认弹窗（T-M2-03）=====
+   遮罩用半透明纯黑（不用 blur：ADR-033 规则 6）；弹层用 1px 边框 + 极轻阴影分层 */
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.32);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+.modal {
+  width: min(520px, 92vw);
+  max-height: 86vh;
+  overflow: auto;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-overlay);
+  padding: var(--sp-5);
+}
+.modal-head {
+  font-size: var(--fs-lg);
+  margin-bottom: var(--sp-2);
+}
+.modal-summary {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  background: var(--bg-sunken);
+  border-radius: var(--r-control);
+  padding: var(--sp-2);
+  margin: 0 0 var(--sp-3);
+  line-height: 1.55;
+}
+.modal-note {
+  margin: var(--sp-3) 0;
+  line-height: 1.7;
+}
+.modal-actions {
+  display: flex;
+  gap: var(--sp-2);
+  justify-content: flex-end;
+}
+.modal-danger {
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.modal-danger-row {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+}
+.btn-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+.btn-danger:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.btn-danger-ghost {
+  color: var(--danger);
+  border-color: var(--border-default);
+}
+/* Pin 态：用 accent 描边 + 实心星，不铺满（避免和主按钮抢注意力） */
+.btn-pin-on {
+  color: var(--accent-text);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+/* 列表行内 Pin 开关：默认极淡，hover 才显形（避免每行都有个星抢注意力） */
+.pin-toggle {
+  border: 0;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-size: var(--fs-sm);
+  line-height: 1;
+  padding: 0 2px 0 0;
+  opacity: 0.35;
+}
+.mem-row:hover .pin-toggle {
+  opacity: 1;
+}
+.pin-toggle.pin-on {
+  color: var(--accent);
+  opacity: 1;
+}
+.pin-toggle:hover {
+  color: var(--accent);
+}
+
+/* ===== 编辑栏（T-M2-02）===== */
+.edit-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: var(--sp-2) 0;
+}
+.edit-feedback {
+  font-size: var(--fs-xs);
+  margin-left: auto;
+}
+/* 四态只用语义色区分"写成/没写"，不用颜色表达"成功等级"（ADR-033 规则 3） */
+.edit-feedback.is-ok {
+  color: var(--ok);
+}
+.edit-feedback.is-warn {
+  color: var(--warn);
+}
+.edit-feedback.is-danger {
+  color: var(--danger);
+}
+.edit-area {
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--sp-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-control);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-md);
+  line-height: 1.6;
+  resize: vertical;
+}
+.edit-area:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* 编辑态的元数据区（重要度 / 标签）——用 grid 对齐，避免标签换行把高度撑乱 */
+.edit-meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+.edit-field {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.imp-picker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+/* 重要度：选中用实心 accent，未选用描边——只有"当前值"着色（ADR-033 规则 3） */
+.imp-pick {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-control);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+.imp-pick:hover {
+  background: var(--bg-hover);
+}
+.imp-pick-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: var(--fw-semibold);
+}
+.tag-editor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--r-control);
+  background: var(--bg-sunken);
+  color: var(--text-secondary);
+  font-size: var(--fs-xs);
+}
+.tag-del {
+  border: 0;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-size: var(--fs-sm);
+  line-height: 1;
+  padding: 0 2px;
+}
+.tag-del:hover {
+  color: var(--danger);
+}
+.tag-input {
+  min-width: 140px;
+  padding: 4px 8px;
+  border: 1px dashed var(--border-default);
+  border-radius: var(--r-control);
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-xs);
+}
+.tag-input:focus {
+  outline: none;
+  border-style: solid;
+  border-color: var(--accent);
+}
+
+/* ===== 近 7 天趋势（ADR-033：单色实心柱，长度编码数值；无渐变、无阴影） ===== */
+.trend {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--sp-3);
+  height: 104px;
+  padding: var(--sp-2) 0 0;
+}
+.trend-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+}
+.trend-n {
+  font-size: var(--fs-2xs);
+  color: var(--text-tertiary);
+  line-height: 1;
+  min-height: 12px;
+}
+.trend-track {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  /* 只留一条基线，**不要整块底色**：
+     整块浅灰会让"0 条的那天"看起来也有一根满高灰柱 —— 违背"长度编码数值"（ADR-033 规则 2）。 */
+  border-bottom: 1px solid var(--border-subtle);
+}
+.trend-fill {
+  display: block;
+  width: 100%;
+  min-height: 0; /* 0 值必须完全不可见 */
+  background: var(--data-muted);
+  border-radius: var(--r-control) var(--r-control) 0 0;
+}
+.trend-day {
+  font-size: var(--fs-2xs);
+  line-height: 1;
+}
+
+/* ===== 待办清单（总览第三层）===== */
+.todo-list {
+  display: flex;
+  flex-direction: column;
+}
+.todo-row {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-1);
+  margin: 0 calc(var(--sp-1) * -1);
+  border: 0;
+  border-bottom: 1px solid var(--border-subtle);
+  background: transparent;
+  border-radius: var(--r-control);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+.todo-row:last-child {
+  border-bottom: 0;
+}
+.todo-row:hover:not(:disabled) {
+  background: var(--bg-hover);
+}
+.todo-row:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+.todo-label {
+  font-size: var(--fs-md);
+  color: var(--text-primary);
+}
+.todo-n {
+  font-size: var(--fs-md);
+  color: var(--text-secondary);
+}
+/* 只有"确实有积压"才用语义色——正常状态保持灰（ADR-033 规则 3） */
+.todo-non {
+  color: var(--warn);
+  font-weight: var(--fw-semibold);
+}
+
+/* ---- 表格：表头更轻，行悬停有反馈 ---- */
+.tbl tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+/* ---- 滚动条（细一点，接近 Linear）---- */
+.side-scroll::-webkit-scrollbar,
+.main::-webkit-scrollbar,
+.rows::-webkit-scrollbar,
+.detail-pane::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.side-scroll::-webkit-scrollbar-thumb,
+.main::-webkit-scrollbar-thumb,
+.rows::-webkit-scrollbar-thumb {
+  background: var(--border-default, var(--border-subtle));
+  border-radius: var(--r-full, 9999px);
+}
+
+.side-scroll::-webkit-scrollbar-track,
+.main::-webkit-scrollbar-track,
+.rows::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ============================================================
+ * 色彩强化层（M2 v3）—— 让界面"有色彩"但不花
+ *
+ * 手段：给指标卡加**语义淡底**（不是纯白），数字用主题色；
+ *      分层每一层有自己的颜色；侧栏当前项有强调底色。
+ * 约束：仍是 token（红线 4），且颜色只承担「语义」不承担「装饰」。
+ * ============================================================ */
+
+/* ---- 指标卡：语义淡底 + 主题色数字 ---- */
+.stat-ok {
+  background: color-mix(in srgb, var(--ok) 7%, var(--bg-surface));
+  border-color: color-mix(in srgb, var(--ok) 22%, var(--border-subtle));
+}
+
+.stat-ok .stat-value {
+  color: var(--ok);
+}
+
+.stat-warn {
+  background: color-mix(in srgb, var(--warn) 8%, var(--bg-surface));
+  border-color: color-mix(in srgb, var(--warn) 24%, var(--border-subtle));
+}
+
+.stat-warn .stat-value {
+  color: var(--warn);
+}
+
+.stat-danger {
+  background: color-mix(in srgb, var(--danger) 7%, var(--bg-surface));
+  border-color: color-mix(in srgb, var(--danger) 22%, var(--border-subtle));
+}
+
+.stat-danger .stat-value {
+  color: var(--danger);
+}
+
+/* 中性卡：用 accent 淡底，让四张卡都有色彩而不是三彩一白 */
+.stat-card:not(.stat-ok):not(.stat-warn):not(.stat-danger) {
+  background: color-mix(in srgb, var(--accent) 5%, var(--bg-surface));
+  border-color: color-mix(in srgb, var(--accent) 16%, var(--border-subtle));
+}
+
+.stat-card:not(.stat-ok):not(.stat-warn):not(.stat-danger) .stat-value {
+  color: var(--accent-text, var(--accent));
+}
+
+/* ---- 侧栏：当前项用 accent 淡底 + 左侧强调 ---- */
+.item.active {
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg-surface));
+  box-shadow: inset 2px 0 0 var(--accent);
+  color: var(--accent-text, var(--accent));
+}
+
+/* ---- 分层：每层一个色（L0 蓝 / L1 紫 / L2 青 / L3 灰）---- */
+.layer-row[data-layer="l0"] .layer-name b {
+  color: var(--info);
+}
+
+.layer-row[data-layer="l1"] .layer-name b {
+  color: var(--accent);
+}
+
+.layer-row[data-layer="l2"] .layer-name b {
+  color: var(--ok);
+}
+
+.layer-row[data-layer="l3"] .layer-name b {
+  color: var(--text-tertiary);
+}
+
+/* ---- 卡片标题：左侧小色条（让每个区块有识别度）---- */
+.card-head {
+  position: relative;
+  padding-left: 12px;
+}
+
+.card-head::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 14px;
+  border-radius: var(--r-control);
+  background: var(--accent);
+  opacity: 0.7;
+}
+
+/* ---- 顶部标题：加一条品牌渐变短标记 ---- */
+.page-head h1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-head h1::before {
+  content: "";
+  width: 4px;
+  height: 18px;
+  border-radius: var(--r-control);
+  /* ADR-033：品牌标记用单色，不再用 accent→info 的双色相渐变（会发脏） */
+  background: var(--accent);
+}
+
+/* ---- 记忆列表左侧：按 agent 上色（一眼看出谁写的）---- */
+.mem-row[data-agent="dsh"] {
+  border-left-color: color-mix(in srgb, var(--agent-dsh) 55%, transparent);
+}
+
+.mem-row[data-agent="hermes"] {
+  border-left-color: color-mix(in srgb, var(--agent-hermes) 55%, transparent);
+}
+
+.mem-row[data-agent="pi"] {
+  border-left-color: color-mix(in srgb, var(--agent-pi) 55%, transparent);
+}
+
+.mem-row[data-agent="workbuddy"] {
+  border-left-color: color-mix(in srgb, var(--agent-workbuddy) 55%, transparent);
+}
+
+.mem-row {
+  border-left-width: 3px;
+}
+
+.mem-row-active {
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+/* ---- 深色模式：淡底用更低混合比，避免发灰 ---- */
+@media (prefers-color-scheme: dark) {
+  .stat-ok {
+    background: color-mix(in srgb, var(--ok) 14%, var(--bg-surface));
+  }
+
+  .stat-warn {
+    background: color-mix(in srgb, var(--warn) 14%, var(--bg-surface));
+  }
+
+  .stat-danger {
+    background: color-mix(in srgb, var(--danger) 14%, var(--bg-surface));
+  }
+
+  .stat-card:not(.stat-ok):not(.stat-warn):not(.stat-danger) {
+    background: color-mix(in srgb, var(--accent) 12%, var(--bg-surface));
+  }
+
+  .item.active {
+    background: color-mix(in srgb, var(--accent) 18%, var(--bg-surface));
+  }
+}
+
+/* ============================================================
+ * 数据可视化层（M2 v4）—— 能用图就不用文字
+ *
+ * 核心：数量差异用**条形长度**表达（谁多谁更长），颜色沿用 agent 身份色。
+ * 全部 token（红线 4）。
+ * ============================================================ */
+
+/* ---- 指标卡的微进步条（例如"今日新增 / 总量"）---- */
+.stat-progress {
+  height: 3px;
+  border-radius: var(--r-full, 9999px);
+  background: color-mix(in srgb, var(--text-tertiary) 18%, transparent);
+  margin: 6px 0 2px;
+  overflow: hidden;
+}
+
+.stat-progress i {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-full, 9999px);
+  background: currentColor;
+  opacity: 0.75;
+  transition: width 400ms var(--ease-decel, cubic-bezier(0.2, 0.8, 0.2, 1));
+}
+
+/* ---- Agent 条形图 ---- */
+.abar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 0;
+}
+
+.abar-row {
+  display: grid;
+  grid-template-columns: 10px 92px minmax(0, 1fr) 44px 76px;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  margin: 0 -8px;
+  border: none;
+  background: transparent;
+  border-radius: var(--r-control);
+  font-family: inherit;
+  font-size: var(--fs-md);
+  cursor: pointer;
+  text-align: left;
+}
+
+.abar-row:hover {
+  background: var(--bg-hover);
+}
+
+.abar-name {
+  color: var(--text-primary);
+  font-weight: var(--fw-medium);
+}
+
+.abar-track {
+  height: 16px;
+  border-radius: var(--r-control);
+  background: color-mix(in srgb, var(--text-tertiary) 10%, transparent);
+  overflow: hidden;
+  position: relative;
+}
+
+.abar-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-control);
+  position: relative;
+  /* 小值也必须可见：1/47 ≈ 2% 会不可见，给 8px 下限 */
+  min-width: 8px;
+  transition: width 500ms var(--ease-decel, cubic-bezier(0.2, 0.8, 0.2, 1));
+}
+
+/* 今日新增：用**纯明度蒙版**压暗一档表示"最新的那部分"（ADR-033 规则 2）。
+   ⚠️ 这里踩过一次：先写成 `color-mix(accent 78%, #000)` 得到深紫色，
+   盖在 WorkBuddy 的橙色条上 = 紫+橙两个色相叠加，比原来的斜纹更脏。
+   正确做法是**不引入新色相**——纯黑半透明只压明度，底色是什么色相就还是什么色相。 */
+.abar-today {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: var(--r-control);
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.abar-num {
+  text-align: right;
+  font-weight: var(--fw-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.abar-meta {
+  text-align: right;
+}
+
+/* agent 身份色：填充条与点 */
+.abar-fill[data-agent="dsh"] {
+  background: var(--agent-dsh);
+}
+
+.abar-fill[data-agent="hermes"] {
+  background: var(--agent-hermes);
+}
+
+.abar-fill[data-agent="pi"] {
+  background: var(--agent-pi);
+}
+
+.abar-fill[data-agent="workbuddy"] {
+  background: var(--agent-workbuddy);
+}
+
+/* 图例 */
+.abar-legend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.abar-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.abar-legend i {
+  width: 14px;
+  height: 8px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+/* 图例：必须展示**实际使用的颜色**。曾用 agent-dsh→workbuddy 双色渐变，既不代表任一 agent，
+   又暗示"连续过渡"（Datawrapper：类别不要用渐变，读者会读成排序）。改为中性色块。 */
+.lg-strong {
+  background: var(--text-secondary);
+}
+
+.lg-soft {
+  background: color-mix(in srgb, var(--text-tertiary) 45%, transparent);
+}
+
+.abar-note {
+  margin-left: auto;
+}
+
+/* ---- 最近写入：时间轴样式 ---- */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0 0;
+  position: relative;
+}
+
+.tl-row {
+  display: grid;
+  grid-template-columns: 10px 68px minmax(0, 1fr) 72px;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0 7px 2px;
+  cursor: pointer;
+  font-size: var(--fs-md);
+  position: relative;
+}
+
+/* 竖线：从每个点连到下一个点 */
+.tl-row::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  bottom: -50%;
+  width: 1px;
+  background: var(--border-subtle);
+}
+
+.tl-row:last-child::before {
+  display: none;
+}
+
+.tl-row:hover {
+  background: var(--bg-hover);
+  border-radius: var(--r-control);
+}
+
+.tl-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  justify-self: center;
+  background: var(--text-tertiary);
+  box-shadow: 0 0 0 3px var(--bg-surface);
+}
+
+.tl-dot[data-agent="dsh"] {
+  background: var(--agent-dsh);
+}
+
+.tl-dot[data-agent="hermes"] {
+  background: var(--agent-hermes);
+}
+
+.tl-dot[data-agent="pi"] {
+  background: var(--agent-pi);
+}
+
+.tl-dot[data-agent="workbuddy"] {
+  background: var(--agent-workbuddy);
+}
+
+.tl-agent {
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-medium);
+  border-radius: var(--r-control);
+  padding: 1px 6px;
+  text-align: center;
+  background: var(--bg-sunken);
+  color: var(--text-secondary);
+}
+
+.tl-agent[data-agent="dsh"] {
+  background: var(--agent-dsh-soft);
+  color: var(--agent-dsh);
+}
+
+.tl-agent[data-agent="hermes"] {
+  background: var(--agent-hermes-soft);
+  color: var(--agent-hermes);
+}
+
+.tl-agent[data-agent="pi"] {
+  background: var(--agent-pi-soft);
+  color: var(--agent-pi);
+}
+
+.tl-agent[data-agent="workbuddy"] {
+  background: var(--agent-workbuddy-soft);
+  color: var(--agent-workbuddy);
+}
+
+.tl-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-primary);
+}
+
+.tl-time {
+  text-align: right;
+}
+
+/* ---- 微小动效：进页面时卡片轻微上浮（克制，不做花活）---- */
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.card,
+.stat-card {
+  animation: cardIn 260ms var(--ease-decel, cubic-bezier(0.2, 0.8, 0.2, 1)) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .stat-card,
+  .abar-fill,
+  .stat-progress i {
+    animation: none;
+    transition: none;
+  }
+}
+
+
+/* ---- 连接页：每 agent 一张卡（与总览的条形图同一语言）---- */
+.conn-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-cell);
+}
+
+@media (max-width: 1180px) {
+  .conn-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.conn-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 卡片左边条用 agent 身份色 */
+.conn-card[data-agent="dsh"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--agent-dsh);
+}
+.conn-card[data-agent="hermes"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--agent-hermes);
+}
+.conn-card[data-agent="pi"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--agent-pi);
+}
+.conn-card[data-agent="workbuddy"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--agent-workbuddy);
+}
+
+.conn-off {
+  opacity: 0.72;
+}
+
+.conn-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.conn-name {
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+}
+
+.conn-top .badge {
+  margin-left: auto;
+}
+
+.conn-num {
+  font-size: var(--fs-num);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.conn-track {
+  margin: 4px 0;
+}
+
+.conn-meta {
+  margin-top: auto;
+}
+
+/* ============================================================
+ * 张力收紧层（v5）—— 修"卡片太大 / 文字太大 / 没有层级"
+ *
+ * 依据：
+ * - Precision & Density：dashboard 用 32px 控件高、8-12px padding、13px 正文、
+ *   "borders-only"（信息密度 > 阴影）
+ * - Radix：卡片背景用 step-2、边框用 step-6（不要额外阴影堆叠）
+ * - Linear：渐变 < 8% 且只在 hero；常规页用纯色底
+ * ============================================================ */
+
+/* ---- 1) 背景回到纯色（去掉之前的紫光/蓝光渐变——那是"随意感"的来源）---- */
+body {
+  background: var(--bg-canvas);
+}
+
+.app {
+  background: transparent;
+}
+
+/* ---- 2) 卡片收紧：padding 12px、圆角 6px、只留一层极轻阴影 ---- */
+.card {
+  padding: var(--sp-3);
+  border-radius: var(--r-card);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  box-shadow: var(--card-shadow);
+}
+
+/* 去掉列表/详情面板的强制高度（原来 320px 让空面板也很大） */
+.list-pane,
+.detail-pane {
+  min-height: 0;
+}
+
+/* ---- 3) 指标卡：更小、更紧 ----
+ * 卡片高度由内容决定；padding 12px；数字 21px；标签 11px。 */
+.stat-card {
+  padding: var(--sp-3);
+  border-radius: var(--r-card);
+  box-shadow: var(--card-shadow);
+}
+
+.stat-value {
+  font-size: var(--fs-num);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: var(--fs-2xs);
+  margin-top: 2px;
+}
+
+.stat-sub {
+  font-size: var(--fs-2xs);
+}
+
+.stat-progress {
+  margin: 5px 0 1px;
+  height: 2px;
+}
+
+/* ---- 4) 字号统一到阶梯：标题 18 / 卡片标题 13 / 正文 13 / 说明 11-12 ---- */
+.page-head h1 {
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.page-head .desc {
+  font-size: var(--fs-xs);
+  line-height: var(--lh-tight);
+}
+
+.card-head {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  padding-bottom: var(--sp-2);
+}
+
+/* 正文与列表统一 13px（原来是 fs-md 但行高没控） */
+.mem-row-summary,
+.tl-text,
+.agent-name,
+.abar-name,
+.recent-text {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-tight);
+}
+
+/* 说明文字统一 11-12px */
+.num-sub {
+  font-size: var(--fs-2xs);
+  line-height: 1.5;
+}
+
+/* ---- 5) 建立层级：主卡片 vs 次卡片 ----
+ * 主卡片（.card）白底 + 边框；次卡片（.card-flat）灰底无阴影，用于"辅助说明块"。 */
+.card-flat {
+  background: var(--bg-sunken);
+  border: 1px solid transparent;
+  box-shadow: none;
+}
+
+/* ---- 6) 收紧布局间距（原来 20-24px 偏松）---- */
+.content {
+  gap: var(--sp-4);
+  padding: var(--sp-5) var(--sp-4) var(--sp-6);
+  max-width: 1160px;
+}
+
+.stats {
+  gap: var(--sp-2);
+}
+
+.two-col {
+  gap: var(--sp-3);
+}
+
+.conn-grid {
+  gap: var(--sp-2);
+}
+
+/* ---- 7) 侧栏收紧 ---- */
+.side {
+  width: 208px;
+  flex: 0 0 208px;
+  background: var(--bg-sunken);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.side-hd {
+  padding: 12px 12px 8px;
+}
+
+.side-scroll {
+  padding: 4px 6px;
+}
+
+.sect {
+  font-size: var(--fs-2xs);
+  padding: 10px 6px 4px;
+}
+
+.item {
+  padding: 6px 6px;
+  font-size: var(--fs-sm);
+  border-radius: var(--r-control);
+}
+
+.item .nav-icon {
+  width: 14px;
+  font-size: var(--fs-xs);
+}
+
+.side-ft {
+  padding: 8px 12px;
+  font-size: var(--fs-2xs);
+}
+
+/* ---- 8) 指标卡语义淡底改用 Radix step-3（原来是 color-mix 混合，偏灰）---- */
+.stat-ok {
+  background: var(--ok-soft);
+  border-color: transparent;
+}
+
+.stat-warn {
+  background: var(--warn-soft);
+  border-color: transparent;
+}
+
+.stat-danger {
+  background: var(--danger-soft);
+  border-color: transparent;
+}
+
+.stat-card:not(.stat-ok):not(.stat-warn):not(.stat-danger) {
+  background: var(--accent-soft);
+  border-color: transparent;
+}
+
+.stat-ok .stat-value {
+  color: var(--green-11);
+}
+
+.stat-warn .stat-value {
+  color: var(--amber-11);
+}
+
+.stat-danger .stat-value {
+  color: var(--red-11);
+}
+
+.stat-card:not(.stat-ok):not(.stat-warn):not(.stat-danger) .stat-value {
+  color: var(--indigo-11);
+}
+
+/* ---- 9) 条形图收紧（条高 16 → 10px）---- */
+.abar-track {
+  height: 10px;
+}
+
+.abar-row {
+  padding: 5px 6px;
+  grid-template-columns: 8px 80px minmax(0, 1fr) 40px 64px;
+  gap: 8px;
+}
+
+.abar-num {
+  font-size: var(--fs-sm);
+}
+
+/* ---- 10) 时间轴收紧 ---- */
+.tl-row {
+  padding: 5px 0 5px 2px;
+  grid-template-columns: 8px 60px minmax(0, 1fr) 64px;
+  gap: 8px;
+}
+
+/* ---- 11) 表格收紧（表头 11px / 单元格 12px / 行高 32px）---- */
+.tbl th {
+  font-size: var(--fs-2xs);
+  padding: 6px 8px;
+}
+
+.tbl td {
+  font-size: var(--fs-xs);
+  padding: 7px 8px;
+}
+
+/* ---- 12) 连接页卡片收紧 ---- */
+.conn-card {
+  padding: var(--sp-3);
+  gap: 4px;
+}
+
+.conn-num {
+  font-size: var(--fs-xl);
+}
+
+.conn-track {
+  height: 8px;
+  margin: 2px 0;
+}
+
+/* ---- 13) 按钮收紧（高度 28px）---- */
+.btn {
+  font-size: var(--fs-xs);
+  padding: 4px 10px;
+  border-radius: var(--r-control);
+}
+
+.btn-sm {
+  font-size: var(--fs-2xs);
+  padding: 3px 8px;
+}
+
+/* ---- 14) 分层行收紧 ---- */
+.layer-row {
+  grid-template-columns: 76px minmax(0, 1fr) auto;
+  gap: var(--sp-2);
+  padding: 6px 0;
+}
+
+.layer-bar {
+  height: 5px;
+}
+
+.layer-name b {
+  font-size: var(--fs-sm);
+}
+
+.layer-val {
+  font-size: var(--fs-sm);
+}
+
+/* ---- 15) 去掉卡片进场动画（Linear 的克制：动效只在交互上）---- */
+.card,
+.stat-card {
+  animation: none;
+}
+
+/* ============================================================
+ * 字体排印层（v6）—— 修"文字没有规范标准"
+ *
+ * 根因（实测）：
+ *   @fontsource-variable/inter 只带 latin/greek/cyrillic/vietnamese 子集，
+ *   **不含中文字形** ⇒ 中文回退到系统默认（微软雅黑），与 Inter 混排时
+ *   基线、视觉重量、字宽都不一致，看起来"不精致"。
+ *
+ * 修法（中文 SaaS 的标准做法）：
+ *   英文优先 Inter Variable（西文形态最好），中文按平台优先级回退到
+ *   PingFang SC / 微软雅黑 UI / Noto Sans SC，并开启字体特性让数字整齐。
+ * ============================================================ */
+
+html,
+body {
+  font-family:
+    "Inter Variable",
+    "Inter",
+    -apple-system,
+    "Segoe UI",
+    "PingFang SC",
+    "Microsoft YaHei UI",
+    "Microsoft YaHei",
+    "Noto Sans SC",
+    system-ui,
+    sans-serif;
+  /* cv11 = 单层 a（Linear/Vercel 都用这个形态，更利落）
+     ss01 = 备选数字形态（不生效则忽略）
+     tnum 不在这里全局开，只给数字元素开，避免正文变宽 */
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ---- 数字统一等宽（tabular-nums）：表格/指标对齐靠这个 ---- */
+.stat-value,
+.abar-num,
+.conn-num,
+.layer-val,
+.kv-v,
+.tbl td,
+.tl-time,
+.abar-meta,
+.num-sub {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* ---- 等宽字体（路径/ID）：中文回退也要指定 ---- */
+.mono {
+  font-family:
+    "JetBrains Mono Variable",
+    "JetBrains Mono",
+    ui-monospace,
+    "Cascadia Code",
+    "SFMono-Regular",
+    Consolas,
+    "Microsoft YaHei UI",
+    monospace;
+  font-size: 0.95em;
+}
+
+/* ---- 中文行高补偿：中文字面比西文大，行高给足更整齐 ---- */
+body {
+  line-height: var(--lh-body);
+  color: var(--text-primary);
+}
+
+/* 标题用紧行高，正文用松行高（层级靠这个区分，不只是字号） */
+.page-head h1,
+.card-head,
+.stat-value,
+.conn-num,
+.abar-name {
+  line-height: var(--lh-tight);
+}
+
+/* ---- 修 Agent 标签与记忆文字挤在一起（tl-row 列间距）---- */
+.tl-row {
+  grid-template-columns: 9px 80px minmax(0, 1fr) 60px;
+  column-gap: 10px;
+}
+
+.tl-agent {
+  justify-self: start;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+}
+
+/* ---- 最近写入密一点（能多看几条）---- */
+.tl-row {
+  padding: 4px 0 4px 2px;
+}
+
+/* ---- 指标卡再压一档（高度更接近 Linear 的 stat 卡）---- */
+.stat-card {
+  padding: 10px 12px;
+}
+
+.stat-value {
+  font-size: 20px;
+  line-height: 1.15;
+}
+
+.stat-label {
+  font-size: var(--fs-2xs);
+  margin-top: 1px;
+  color: var(--text-secondary);
+}
+
+.stat-progress {
+  margin: 4px 0 0;
+}
+
+/* ---- 卡片标题与正文的层级：标题 12px 中粗 + 正文 13px 常规 ---- */
+.card-head {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--text-primary);
+  border-bottom-color: var(--border-subtle);
+  padding-bottom: var(--sp-2);
+}
+
+/* ---- 页面副标题（desc）用 12px，不要 13 抢主标题 ---- */
+.page-head .desc {
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+}
+
+/* ---- 侧栏项：13px、选中态用 500 ---- */
+.item {
+  font-size: var(--fs-sm);
+}
+
+.item.active {
+  font-weight: var(--fw-medium);
+}
+
+/* ---- 表格数字列右对齐（数量类靠右更易比较）---- */
+.tbl td:nth-child(2),
+.tbl td:nth-child(3),
+.tbl td:nth-child(4) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.tbl th:nth-child(2),
+.tbl th:nth-child(3),
+.tbl th:nth-child(4) {
+  text-align: right;
+}
+
+/* ==========================================================================
+   视觉重构 v3 · ADR-035 · 2026-11-13
+   --------------------------------------------------------------------------
+   为什么全部写在文件末尾、用同或更高特异性覆盖：
+   这个文件有 6 个选择器被重复定义（.content / .card / .stats / .two-col /
+   .btn 各 2 次，.side 3 次）。改「前面那条」很可能不生效，改错了还难查。
+   末尾覆盖的优先级明确、集中、可整段回滚。清理重复定义是独立任务。
+   ========================================================================== */
+
+:root {
+  /* 字重：500/600 → 510/590（Inter Variable 的中间档，Linear 做法） */
+  --fw-medium: 510;
+  --fw-semibold: 590;
+
+  /* 圆角：卡片 6 → 8（Linear 的上限值） */
+  --r-card: 8px;
+
+  /* 行高：13px 正文配 1.55 偏松 */
+  --lh-body: 1.5;
+
+  /* 层级：去掉纯白。页面下移一档，卡片用 gray-1 */
+  --bg-canvas: var(--gray-2);
+  --bg-surface: var(--gray-1);
+
+  /* 边框退一档：gray-6 → gray-4（Geist「每条边框只画一次」） */
+  --border-subtle: var(--gray-4);
+
+  /* 阴影分档，全部纯黑透明（Linear：不用彩色阴影） */
+  --shadow-tint: 0, 0, 0;
+  --shadow-raised: 0 4px 8px rgba(var(--shadow-tint), 0.06);
+
+  /* 动效基座：工具型产品用 M3 standard（几乎不回弹） */
+  --dur: 120ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* 暗色主题的层级方向与亮色相反（卡片比页面亮），显式恢复，别被上面的 :root 盖掉 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-canvas: var(--gray-1);
+    --bg-surface: var(--gray-2);
+  }
+}
+
+/* ---- 布局：内容最大宽 1160 → 1400 ---- */
+.content {
+  max-width: 1400px;
+}
+
+/* ---- 卡片：撤边框，单层阴影（原来 border + shadow 是画两次） ---- */
+.card {
+  border-color: transparent;
+  box-shadow: var(--shadow-card);
+}
+
+/* ---- 指标卡：背景一律中性，只染数字 ----
+   原来 .stat-ok/.stat-warn 用 color-mix 把整块底染成淡绿/淡黄，
+   彩色面积约 20%，会压过真正的内容。现在底中性，语义色只留给数字。 */
+.stat-ok,
+.stat-warn,
+.stat-danger {
+  background: var(--bg-surface);
+  border-color: transparent;
+  box-shadow: var(--shadow-card);
+}
+
+/* 左侧 3px 语义色条保留（用户偏好），但默认色弱化 */
+.stat-card::before {
+  background: var(--border-default);
+}
+
+/* ---- 徽章：小方块 → 胶囊 ---- */
+.badge {
+  border-radius: var(--r-full);
+  padding: 2px 8px;
+}
+
+/* ---- 按钮：padding 回 4 的倍数 + 按下反馈 ---- */
+.btn {
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* ---- 标题负字距（随字号递增，大字号不收会显得散） ---- */
+.page-head h1 {
+  letter-spacing: -0.02em;
+}
+
+/* ---- 交互反馈：统一 120ms ----
+   只给「本来就该有过渡」的元素，不给静态内容加过渡（避免无意义的重绘）。 */
+.side-item,
+.mem-row,
+.todo-row,
+.abar-row,
+.badge,
+.agent-row,
+.card-head button {
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+
+/* 尊重系统设置：已有两处 reduced-motion 分支，这里再兜一层 */
+@media (prefers-reduced-motion: reduce) {
+  .btn:active:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* ---- 指标卡边框也撤掉（.stat-card 自己的 border，与 .card 是两套） ---- */
+.stat-card {
+  border-color: transparent;
+}
+
+/* ---- tone="normal" 的数字不该染色 ----
+   原规则把「非 ok/warn/danger」的数字染成 --indigo-11（紫），
+   但按 ADR-035「语义色只染数字」的意思，是「只有有语义时才染」，
+   中性指标应该跟正文同色。紫色会让每张卡都像在报警。 */
+.stat-card:not(.stat-ok):not(.stat-warn):not(.stat-danger) .stat-value {
+  color: var(--text-primary);
+}
+
+/* ===== T-M2-05 合并弹窗（复用 .modal；新增候选列表与预览条）=====
+   为什么单独一组：合并弹窗比删除弹窗宽（要并排放两条 + 候选列表），
+   且 .btn-accent 是项目里第一个"主操作按钮"——之前所有按钮都是同一种描边样式。 */
+.modal-wide {
+  width: min(640px, 94vw);
+}
+.merge-keep {
+  margin-bottom: var(--sp-2);
+}
+.merge-keep .modal-summary {
+  margin: 0 0 var(--sp-2);
+}
+.merge-cands {
+  list-style: none;
+  margin: var(--sp-2) 0 0;
+  padding: 0;
+  max-height: 200px;
+  overflow: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-control);
+  background: var(--bg-surface);
+}
+.merge-cand {
+  padding: var(--sp-2) var(--sp-3);
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.merge-cand:last-child {
+  border-bottom: none;
+}
+.merge-cand:hover {
+  background: var(--bg-hover);
+}
+.merge-cand.is-sel {
+  background: var(--accent-soft);
+}
+.merge-cand-empty {
+  cursor: default;
+}
+.merge-cand-empty:hover {
+  background: transparent;
+}
+.merge-cand-sum {
+  font-size: var(--fs-sm);
+  color: var(--text-primary);
+}
+.merge-cand-meta {
+  margin-top: 2px;
+}
+.merge-preview {
+  margin-top: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--bg-sunken);
+  border-radius: var(--r-control);
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.merge-preview b {
+  color: var(--text-primary);
+  font-weight: var(--fw-semibold);
+}
+.merge-actions {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  margin-top: var(--sp-3);
+}
+.btn-accent {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.btn-accent:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: #fff;
+}
+.btn-accent:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+/* ---- T-M2-05 修正：详情按钮行从 3 个涨到 5 个（编辑/Pin/失效/合并/删除），
+        固定单行会把每个按钮的文字压成竖排（实测 width=62 / height=129）。
+        flex-wrap 让按钮换行；反馈文案独占一行（原 margin-left:auto 会继续挤压按钮）。 ---- */
+.edit-bar {
+  flex-wrap: wrap;
+}
+.edit-bar .edit-feedback {
+  margin-left: 0;
+  flex-basis: 100%;
+}
+/* ===== T-M2-06 维护页待办（docs/03 §4.3）=====
+   与总览页的 .todo-row 分开：那边是 3 列（badge + 文案 + 尾），
+   这里要 4 列（计数 + 名称 + 说明 + 动作提示），复用会挤成竖排。 */
+.maint-row {
+  display: grid;
+  grid-template-columns: 56px 132px 1fr auto;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-1);
+  margin: 0 calc(var(--sp-1) * -1);
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--border-subtle);
+  background: transparent;
+  border-radius: var(--r-control);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+.maint-row:hover {
+  background: var(--bg-hover);
+}
+.maint-row .todo-desc {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.todo-body {
+  padding: var(--sp-2) 0 var(--sp-3);
+}
+.dup-group {
+  padding: var(--sp-2) 0;
+  border-top: 1px dashed var(--border-subtle);
+}
+.dup-group:first-child {
+  border-top: none;
+}
+.dup-group-head {
+  margin-bottom: var(--sp-2);
+  color: var(--text-secondary);
+}
+.dup-side {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: baseline;
+  padding: 2px 0;
+}
+.dup-side .dup-sum {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-sm);
+}
+.row-actions {
+  display: flex;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+}
+/* ===== T-M2-07 活动日志（维护页「最近操作」）===== */
+.act-row {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-1);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.act-row:last-child {
+  border-bottom: none;
+}
+.act-sum {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-sm);
+}
+/* ===== T-M2-08 关联列表（JTBD J4）===== */
+.rel-block {
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--border-subtle);
+}
+.rel-row {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+  padding: 2px 0;
+}
+.rel-sum {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-sm);
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+}
+.rel-sum:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+/* ===== T-M7-02 键盘可达：焦点环 =====
+ * 规则：**键盘**聚焦（:focus-visible）必须有可见焦点环；鼠标/程序聚焦（:focus）不显示，
+ * 避免点一下按钮就留一圈框。统一用 --accent token，不裸写色值（docs/03 §3）。 */
+:where(a, button, input, textarea, select, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* 这两个输入区历史上为了"干净"关掉了 outline——现在只对鼠标聚焦关，键盘聚焦仍要有环 */
+.edit-area:focus:not(:focus-visible),
+.tag-input:focus:not(:focus-visible) {
+  outline: none;
+}
+.edit-area:focus-visible,
+.tag-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* 侧栏导航项是 <button class="item">，焦点环要贴合圆角 */
+.item:focus-visible {
+  outline-offset: -2px;
+}
+/* ===== T-M8-01 托盘面板（320×420，ADR-016 自绘面板）=====
+ * `?panel=1` 以前没被消费，右键托盘会把整个应用塞进小窗口；这里给它一套紧凑版式。 */
+.panel {
+  display: flex;
+  flex-direction: column;
+  /* T-M10-46：注释此前写着"改 100%"，代码却还是 100vh（注释与实现不一致）——
+     面板窗口很矮时 100vh 会把容器撑到视口之外，footer 被推到窗口外（"按钮看不到"）。
+     `body/#root` 本来就是 height:100%，这里用 100% 才是真正贴着客户区。 */
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 12px;
+  gap: 10px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+.panel-title {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+}
+.panel-sub {
+  color: var(--text-secondary);
+  font-size: var(--fs-2xs);
+}
+.panel-agents {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  /* T-M10-44：内容多时可滚动（此前无 overflow，4 行 agent + 按钮在 420px 里会被裁掉一半） */
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+.panel-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+.panel-row:hover {
+  background: var(--bg-hover);
+}
+.panel-name {
+  flex: 1;
+  font-size: var(--fs-sm);
+}
+.panel-num {
+  min-width: 30px;
+  text-align: right;
+  font-size: var(--fs-xs);
+}
+.panel-state {
+  font-size: var(--fs-2xs);
+  min-width: 44px;
+  text-align: right;
+}
+.panel-state.ok {
+  color: var(--ok);
+}
+.panel-state.warn {
+  color: var(--text-secondary);
+}
+.panel-mode {
+  width: 34px;
+  text-align: right;
+  font-size: var(--fs-2xs);
+}
+.panel-foot {
+  margin-top: auto;
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.panel-foot .btn {
+  flex: 1;
+}
+/* T-M10-38：托盘面板的显式关闭按钮（此前只能靠失焦，没有 × ） */
+.panel-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--fg-2);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 3px 7px;
+  border-radius: 4px;
+}
+.panel-close:hover {
+  background: var(--bg-3);
+  color: var(--fg);
+}

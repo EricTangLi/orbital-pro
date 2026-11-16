@@ -1,0 +1,30 @@
+[package]
+name = "orbital-app"
+version = "0.94.9"
+edition = "2021"
+
+# 独立 workspace（旧项目已验证：Tauri 壳与核心库分开，避免依赖版本互相拉扯）
+[workspace]
+
+[build-dependencies]
+tauri-build = { version = "2.7.4", features = [] }
+
+[dependencies]
+tauri = { version = "2.12.5", features = ["tray-icon", "image-png"] }
+tauri-plugin-single-instance = "2.5.5"
+tauri-plugin-store = "2.5.1"
+tauri-plugin-window-state = "2.5.0"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+# GUI 只读查询（红线 5 只禁 INSERT/UPDATE，读不受限；WAL 支持多读者）
+rusqlite = { version = "0.42.0", features = ["bundled"] }
+# ADR-034 过渡方案：GUI 需要写通道时复用 MemoryService（唯一实现），
+# 不在 data.rs 里另写一份版本链 SQL。长期改为调用 core 的 HTTP 接口后移除本依赖。
+orbital-core = { path = "../crates/orbital-core" }
+tracing = "0.1.44"
+tracing-subscriber = "0.3"
+sysinfo = "0.40.1"
+
+[profile.release]
+opt-level = "s"
+strip = true

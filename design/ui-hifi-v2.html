@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="light dark" />
+<title>忆核 Orbital · 高保真设计稿 v2</title>
+<style>
+/* ============================================================
+   令牌：与 DESIGN.md 一一对应
+   ============================================================ */
+:root{
+  --font-ui:"Inter Variable","Inter","Segoe UI Variable Text","Segoe UI",
+            "Microsoft YaHei UI","Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+  --font-mono:"JetBrains Mono","Cascadia Code",ui-monospace,monospace;
+
+  /* —— 中性：Radix slate（12 级）—— */
+  --bg-canvas:#fcfcfd; --bg-surface:#f9f9fb; --bg-sunken:#f0f0f3;
+  --bg-hover:#e8e8ec; --bg-active:#e0e1e6;
+  --border-subtle:#d9d9e0; --border-default:#cdced6; --border-strong:#b9bbc6;
+  --text-primary:#1c2024; --text-secondary:#60646c; --text-tertiary:#8b8d98;
+  /* —— 主色：Radix iris —— */
+  --accent:#5b5bd6; --accent-hover:#5151cd; --accent-text:#5753c6; --accent-soft:#f0f1fe;
+  /* —— 状态：Radix green / amber / red —— */
+  --ok:#30a46c; --ok-text:#218358; --ok-soft:#e6f6eb;
+  --warn:#ffc53d; --warn-text:#4f3422; --warn-soft:#fff7c2;
+  --danger:#e5484d; --danger-text:#ce2c31; --danger-soft:#feebec;
+  --info:#3e63dd; --info-text:#3a5bc7;
+
+  --r-control:4px; --r-card:8px; --r-full:9999px;
+  --shadow-card:0 1px 2px rgba(28,32,36,.05);
+  --shadow-overlay:0 8px 24px rgba(28,32,36,.12);
+
+  --dur-1:120ms; --dur-2:160ms; --dur-3:200ms; --dur-4:240ms; --dur-5:400ms;
+  --ease-standard:cubic-bezier(.2,0,0,1);
+  --ease-decel:cubic-bezier(.2,.8,.2,1);
+  --ease-accel:cubic-bezier(.4,0,1,1);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg-canvas:#111113; --bg-surface:#18191b; --bg-sunken:#212225;
+    --bg-hover:#272a2d; --bg-active:#2e3135;
+    --border-subtle:#363a3f; --border-default:#43484e; --border-strong:#5a6169;
+    --text-primary:#edeef0; --text-secondary:#b0b4ba; --text-tertiary:#777b84;
+    --accent:#5b5bd6; --accent-hover:#6e6ade; --accent-text:#b1a9ff; --accent-soft:#202248;
+    --ok:#30a46c; --ok-text:#3dd68c; --ok-soft:#132d21;
+    --warn:#ffc53d; --warn-text:#ffca16; --warn-soft:#302008;
+    --danger:#e5484d; --danger-text:#ff9592; --danger-soft:#3b1219;
+    --info:#3e63dd; --info-text:#9eb1ff;
+    --shadow-card:none;
+  }
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--bg-canvas); color:var(--text-primary);
+  font-family:var(--font-ui); font-size:14px; line-height:22px;
+  -webkit-font-smoothing:antialiased;
+}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:var(--r-control)}
+.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums slashed-zero}
+svg.ic{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ============ 侧栏（shadcn sidebar anatomy）============ */
+.side{
+  width:220px;flex:0 0 220px;background:var(--bg-sunken);
+  border-right:1px solid var(--border-subtle);
+  display:flex;flex-direction:column;
+}
+.side-hd{padding:14px 14px 10px;display:flex;align-items:center;gap:9px}
+.side-hd .mark{width:26px;height:26px;border-radius:6px;flex:none}
+.side-hd .nm{font-size:13.5px;font-weight:660;letter-spacing:-.015em;line-height:1.2}
+.side-hd .sub{font-size:10.5px;color:var(--text-tertiary);line-height:1.3}
+.side-scroll{flex:1;overflow:auto;padding:0 8px}
+.sect{
+  font-size:10.5px;font-weight:600;letter-spacing:.05em;color:var(--text-tertiary);
+  text-transform:uppercase;padding:14px 6px 5px;
+}
+.item{
+  display:flex;align-items:center;gap:8px;min-height:30px;padding:4px 8px;
+  border-radius:var(--r-control);color:var(--text-secondary);font-size:13px;
+  transition:background var(--dur-1) var(--ease-standard), color var(--dur-1);
+  width:100%;text-align:left;
+}
+.item:hover{background:var(--bg-hover);color:var(--text-primary)}
+.item.active{background:var(--bg-surface);color:var(--text-primary);font-weight:600;box-shadow:var(--shadow-card)}
+.item .tail{margin-left:auto;font-size:11px;color:var(--text-tertiary);font-weight:400}
+.item .dot{width:6px;height:6px;border-radius:50%;flex:none}
+.dot.on{background:var(--ok)} .dot.off{background:var(--border-default)} .dot.warn{background:var(--warn)}
+.count{margin-left:auto;background:var(--danger-soft);color:var(--danger-text);font-size:10.5px;font-weight:650;padding:0 6px;border-radius:var(--r-full);line-height:17px}
+.side-ft{border-top:1px solid var(--border-subtle);padding:8px}
+
+/* ============ 主区 ============ */
+.main{flex:1;overflow:auto}
+.content{max-width:1320px;padding:22px 24px 40px;margin:0 auto}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
+.ph h1{margin:0;font-size:20px;line-height:28px;font-weight:650;letter-spacing:-.015em}
+.ph .desc{margin-top:3px;font-size:13px;line-height:20px;color:var(--text-secondary)}
+.ph .acts{display:flex;gap:8px;flex:none}
+
+/* ============ 按钮 ============ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  height:32px;padding:0 12px;border-radius:var(--r-control);
+  background:var(--bg-surface);border:1px solid var(--border-default);
+  color:var(--text-primary);font-size:13px;font-weight:560;
+  transition:background var(--dur-1),border-color var(--dur-1),transform var(--dur-1);
+  white-space:nowrap;
+}
+.btn:hover{background:var(--bg-hover)}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--accent);border-color:var(--accent-text);color:#fff}
+.btn.primary:hover{background:var(--accent-hover)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--text-secondary)}
+.btn.ghost:hover{background:var(--bg-hover);color:var(--text-primary)}
+.btn.danger{background:var(--danger-soft);border-color:transparent;color:var(--danger-text)}
+.btn.sm{height:28px;padding:0 10px;font-size:12px}
+.btn.icon{width:32px;padding:0}
+
+/* ============ 徽标 ============ */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;
+  border-radius:var(--r-full);font-size:11px;font-weight:600;line-height:1;
+  background:var(--bg-sunken);color:var(--text-secondary);white-space:nowrap;
+}
+.badge.ok{background:var(--ok-soft);color:var(--ok-text)}
+.badge.warn{background:var(--warn-soft);color:var(--warn-text)}
+.badge.danger{background:var(--danger-soft);color:var(--danger-text)}
+.badge.accent{background:var(--accent-soft);color:var(--accent-text)}
+
+/* ============ 卡片 ============ */
+.card{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--r-card);box-shadow:var(--shadow-card)}
+.card-hd{display:flex;align-items:center;gap:8px;padding:11px 16px;border-bottom:1px solid var(--border-subtle);font-size:13px;font-weight:600;color:var(--text-secondary)}
+.card-bd{padding:16px}
+
+/* ============ Agent 卡（数据优先）============ */
+.agents{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+@media (max-width:1180px){.agents{grid-template-columns:repeat(2,1fr)}}
+.acard{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--r-card);padding:15px 16px;box-shadow:var(--shadow-card);transition:border-color var(--dur-2)}
+.acard:hover{border-color:var(--border-default)}
+.acard .top{display:flex;align-items:center;gap:7px;margin-bottom:12px}
+.acard .top .dot{width:7px;height:7px;border-radius:50%;flex:none}
+.acard .top .nm{font-size:13.5px;font-weight:650;letter-spacing:-.01em}
+.acard .top .badge{margin-left:auto}
+.acard .big{font-size:36px;line-height:44px;font-weight:700;letter-spacing:-.03em}
+.acard .big .unit{font-size:.45em;font-weight:600;color:var(--text-tertiary);letter-spacing:0;margin-left:2px}
+.acard .lbl{font-size:12px;line-height:16px;color:var(--text-tertiary);margin-bottom:10px}
+.acard .row{display:flex;align-items:flex-end;gap:10px;margin-bottom:10px}
+.acard .row .sp{flex:none;width:88px;height:30px}
+.acard .row .tr{flex:1;text-align:right}
+.trend{display:inline-flex;align-items:center;gap:2px;font-size:12px;font-weight:600}
+.trend.up{color:var(--ok-text)} .trend.flat{color:var(--text-tertiary)}
+/* bar-in-cell */
+.levels{display:flex;height:6px;border-radius:var(--r-full);overflow:hidden;background:var(--bg-sunken);gap:1px}
+.levels i{display:block;height:100%;transition:width var(--dur-3) var(--ease-standard)}
+.levels .l0{background:var(--border-default)}
+.levels .l1{background:var(--accent)}
+.levels .l2{background:var(--ok)}
+.levels .l3{background:var(--warn)}
+.legend{display:flex;flex-wrap:wrap;gap:9px;margin-top:6px;font-size:10.5px;color:var(--text-tertiary)}
+.legend span{display:inline-flex;align-items:center;gap:3px}
+.legend i{width:6px;height:6px;border-radius:2px}
+
+/* ============ 表格 ============ */
+.tbl{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--r-card);overflow:hidden;box-shadow:var(--shadow-card)}
+.thead,.trow{display:grid;align-items:center;gap:12px;padding:0 16px;height:40px}
+.thead{background:var(--bg-sunken);font-size:12px;font-weight:600;color:var(--text-tertiary);border-bottom:1px solid var(--border-subtle)}
+.trow{border-bottom:1px solid var(--border-subtle);font-size:13px;transition:background var(--dur-1)}
+.trow:last-child{border-bottom:0}
+.trow:hover{background:var(--bg-hover)}
+.thead.t-conn,.trow.t-conn{grid-template-columns:1.2fr 84px 84px 84px 80px 64px 148px}
+.thead.t-mem,.trow.t-mem{grid-template-columns:76px 1fr 60px 86px 76px}
+.cell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cell.num{text-align:right}
+.muted{color:var(--text-tertiary);font-size:12px}
+
+/* ============ 主从 ============ */
+.split{display:grid;grid-template-columns:1.4fr 1fr;gap:12px}
+.kv{display:grid;grid-template-columns:88px 1fr;gap:6px 12px;font-size:13px;line-height:20px;margin-top:12px}
+.kv .k{color:var(--text-tertiary)}
+pre{background:var(--bg-sunken);border:1px solid var(--border-subtle);border-radius:var(--r-control);padding:10px 12px;font-family:var(--font-mono);font-size:11.5px;line-height:1.6;overflow:auto;margin:12px 0 0;color:var(--text-secondary)}
+
+/* ============ 检查行（trace 风格）============ */
+.checks{display:flex;flex-direction:column}
+.chk{display:flex;align-items:center;gap:9px;height:38px;padding:0 16px;border-bottom:1px solid var(--border-subtle);font-size:13px}
+.chk:last-child{border-bottom:0}
+.chk .led{width:7px;height:7px;border-radius:50%;flex:none}
+.led.ok{background:var(--ok)} .led.warn{background:var(--warn)} .led.bad{background:var(--danger)} .led.waived{background:var(--text-tertiary);opacity:.5}
+.chk .n{flex:1}
+.chk .v{font-size:12px;color:var(--text-secondary)}
+
+/* ============ 冲突 ============ */
+.cfs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.cf{border:1px solid var(--border-subtle);border-radius:var(--r-control);padding:10px 12px;font-size:13px;line-height:20px}
+.cf.old{background:var(--warn-soft);border-color:transparent}
+.cf .lb{font-size:11px;line-height:16px;color:var(--text-tertiary);font-weight:600;margin-bottom:4px;letter-spacing:.02em}
+
+/* ============ 空态 ============ */
+.empty{padding:30px 16px;text-align:center;color:var(--text-tertiary);font-size:13px}
+.empty b{display:block;color:var(--text-secondary);font-size:14px;margin-bottom:4px}
+
+.hidden{display:none}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.stat-label{font-size:12px;line-height:16px;color:var(--text-tertiary);font-weight:500}
+.stat-value{font-size:34px;line-height:44px;font-weight:700;letter-spacing:-.03em}
+.stat-sub{font-size:12px;line-height:16px;color:var(--text-tertiary)}
+.mt12{margin-top:12px} .mb16{margin-bottom:16px} .flex{display:flex;align-items:center;gap:8px} .spacer{flex:1}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ============ 侧栏 ============ -->
+  <aside class="side">
+    <div class="side-hd">
+      <svg class="mark" viewBox="0 0 1024 1024" aria-label="忆核 Orbital"><rect width="1024" height="1024" rx="226" fill="#4F46E5"/><circle cx="512" cy="512" r="96" fill="#fff"/><path d="M512 300 A212 212 0 1 0 724 512" fill="none" stroke="#fff" stroke-width="52" stroke-linecap="round"/></svg>
+      <div>
+        <div class="nm">忆核</div>
+        <div class="sub">Orbital</div>
+      </div>
+    </div>
+
+    <div class="side-scroll">
+      <div class="sect">Agents</div>
+      <button class="item"><span class="dot on"></span>DSH<span class="tail">Proxy</span></button>
+      <button class="item"><span class="dot on"></span>Hermes<span class="tail">MCP</span></button>
+      <button class="item"><span class="dot on"></span>pi<span class="tail">Proxy</span></button>
+      <button class="item"><span class="dot off"></span>WorkBuddy<span class="tail">off</span></button>
+
+      <div class="sect">Memory</div>
+      <button class="item active" data-page="connect"><svg class="ic"><path d="M12 22v-5"/><path d="M15 8V2"/><path d="M17 8a1 1 0 0 1 1 1v4a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1z"/><path d="M9 8V2"/></svg>连接<span class="tail">3/4</span></button>
+      <button class="item" data-page="memory"><svg class="ic"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>记忆<span class="tail">185</span></button>
+      <button class="item" data-page="maintain"><svg class="ic"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>维护<span class="count">7</span></button>
+      <button class="item" data-page="settings"><svg class="ic"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>设置</button>
+    </div>
+
+    <div class="side-ft">
+      <button class="item"><svg class="ic"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg><span style="font-size:12px">服务状态</span><span class="tail"><span class="dot on" style="display:inline-block"></span></span></button>
+    </div>
+  </aside>
+
+  <!-- ============ 主区 ============ -->
+  <main class="main">
+    <div class="content">
+
+      <!-- ================= 连接 ================= -->
+      <section id="page-connect">
+        <div class="ph">
+          <div><h1>连接</h1><div class="desc">4 个 Agent · 3 已接入 · 今日注入 128 次 · 抽取 41 条</div></div>
+          <div class="acts">
+            <button class="btn"><svg class="ic"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>全部验证</button>
+            <button class="btn primary"><svg class="ic"><path d="M5 12h14"/><path d="M12 5v14"/></svg>新增 Agent</button>
+          </div>
+        </div>
+
+        <!-- 4 张数据卡 -->
+        <div class="agents">
+          <div class="acard">
+            <div class="top"><span class="dot on"></span><span class="nm">DSH</span><span class="badge accent">Proxy</span></div>
+            <div class="big num">1,583</div>
+            <div class="lbl">记忆总数 · 今日 +12</div>
+            <div class="row">
+              <svg class="sp" viewBox="0 0 88 30" preserveAspectRatio="none" aria-hidden="true" style="color:var(--accent)">
+                <polyline fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" points="0,22 13,20 26,15 39,17 52,10 65,13 78,6 88,8"/>
+                <circle cx="88" cy="8" r="2.5" fill="currentColor"/>
+              </svg>
+              <div class="tr"><span class="trend up">↑ +12</span></div>
+            </div>
+            <div class="levels"><i class="l0" style="width:84%"></i><i class="l1" style="width:11%"></i><i class="l2" style="width:4%"></i><i class="l3" style="width:1%"></i></div>
+            <div class="legend"><span><i class="l0"></i>L0 84%</span><span><i class="l1"></i>L1 11%</span><span><i class="l2"></i>L2 4%</span><span><i class="l3"></i>L3 1%</span></div>
+          </div>
+
+          <div class="acard">
+            <div class="top"><span class="dot on"></span><span class="nm">Hermes</span><span class="badge ok">MCP</span></div>
+            <div class="big num">412</div>
+            <div class="lbl">记忆总数 · 今日 +6</div>
+            <div class="row">
+              <svg class="sp" viewBox="0 0 88 30" preserveAspectRatio="none" aria-hidden="true" style="color:var(--accent)">
+                <polyline fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" points="0,19 13,20 26,16 39,18 52,14 65,12 78,11 88,10"/>
+                <circle cx="88" cy="10" r="2.5" fill="currentColor"/>
+              </svg>
+              <div class="tr"><span class="trend up">↑ +6</span></div>
+            </div>
+            <div class="levels"><i class="l0" style="width:76%"></i><i class="l1" style="width:16%"></i><i class="l2" style="width:6%"></i><i class="l3" style="width:2%"></i></div>
+            <div class="legend"><span><i class="l0"></i>L0 76%</span><span><i class="l1"></i>L1 16%</span><span><i class="l2"></i>L2 6%</span><span><i class="l3"></i>L3 2%</span></div>
+          </div>
+
+          <div class="acard">
+            <div class="top"><span class="dot on"></span><span class="nm">pi</span><span class="badge accent">Proxy</span></div>
+            <div class="big num">96</div>
+            <div class="lbl">记忆总数 · 今日 +3</div>
+            <div class="row">
+              <svg class="sp" viewBox="0 0 88 30" preserveAspectRatio="none" aria-hidden="true" style="color:var(--accent)">
+                <polyline fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" points="0,23 13,21 26,22 39,18 52,19 65,15 78,16 88,13"/>
+                <circle cx="88" cy="13" r="2.5" fill="currentColor"/>
+              </svg>
+              <div class="tr"><span class="trend up">↑ +3</span></div>
+            </div>
+            <div class="levels"><i class="l0" style="width:68%"></i><i class="l1" style="width:22%"></i><i class="l2" style="width:8%"></i><i class="l3" style="width:2%"></i></div>
+            <div class="legend"><span><i class="l0"></i>L0 68%</span><span><i class="l1"></i>L1 22%</span><span><i class="l2"></i>L2 8%</span><span><i class="l3"></i>L3 2%</span></div>
+          </div>
+
+          <div class="acard">
+            <div class="top"><span class="dot off"></span><span class="nm">WorkBuddy</span><span class="badge">未接入</span></div>
+            <div class="big num" style="color:var(--text-tertiary)">—</div>
+            <div class="lbl">记忆总数 · 待接入</div>
+            <div class="row"><div class="sp"></div><div class="tr"><span class="trend flat">—</span></div></div>
+            <div class="levels"><i class="l0" style="width:100%;background:var(--bg-sunken)"></i></div>
+            <div class="legend"><span>接入后显示</span></div>
+          </div>
+        </div>
+
+        <!-- 明细表 -->
+        <div class="card mb16">
+          <div class="card-hd"><span>Agent 明细</span><span class="spacer"></span><span class="muted">今日 · 2026-11-10</span></div>
+          <div class="tbl" style="border:0;border-radius:0;box-shadow:none">
+            <div class="thead t-conn"><span>Agent</span><span class="cell num">注入/次</span><span class="cell num">抽取/条</span><span class="cell num">延迟</span><span class="cell num">存储</span><span class="cell num">冲突</span><span>操作</span></div>
+            <div class="trow t-conn">
+              <span class="cell">DSH <span class="muted">0.2.2-rc.1</span></span>
+              <span class="cell num num">64</span><span class="cell num num">18</span><span class="cell num num">302ms</span><span class="cell num num">2.4 MB</span><span class="cell num num">2</span>
+              <span class="cell flex"><button class="btn sm">验证</button><button class="btn sm ghost">断开</button></span>
+            </div>
+            <div class="trow t-conn">
+              <span class="cell">Hermes <span class="muted">0.23.1</span></span>
+              <span class="cell num num">—</span><span class="cell num num">23</span><span class="cell num num">1ms</span><span class="cell num num">0.6 MB</span><span class="cell num num">3</span>
+              <span class="cell flex"><button class="btn sm">验证</button><button class="btn sm ghost">断开</button></span>
+            </div>
+            <div class="trow t-conn">
+              <span class="cell">pi <span class="muted">1.5.0</span></span>
+              <span class="cell num num">51</span><span class="cell num num">0</span><span class="cell num num">287ms</span><span class="cell num num">0.1 MB</span><span class="cell num num">0</span>
+              <span class="cell flex"><button class="btn sm">验证</button><button class="btn sm ghost">断开</button></span>
+            </div>
+            <div class="trow t-conn">
+              <span class="cell">WorkBuddy</span>
+              <span class="cell num num">—</span><span class="cell num num">—</span><span class="cell num num">—</span><span class="cell num num">—</span><span class="cell num num">—</span>
+              <span class="cell flex"><button class="btn sm primary">接入</button></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 记忆 ================= -->
+      <section id="page-memory" class="hidden">
+        <div class="ph">
+          <div><h1>记忆</h1><div class="desc">185 条 · 4 个来源 · 今日新增 12 条</div></div>
+          <div class="acts">
+            <button class="btn"><svg class="ic"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>搜索</button>
+            <button class="btn primary"><svg class="ic"><path d="M5 12h14"/><path d="M12 5v14"/></svg>导入</button>
+          </div>
+        </div>
+
+        <div class="g4">
+          <div class="card"><div class="card-bd"><div class="stat-label">L0 原始对话</div><div class="stat-value num">1,583</div><div class="stat-sub">未压缩</div></div></div>
+          <div class="card"><div class="card-bd"><div class="stat-label">L1 原子事实</div><div class="stat-value num">166</div><div class="stat-sub">当前有效</div></div></div>
+          <div class="card"><div class="card-bd"><div class="stat-label">L2 场景</div><div class="stat-value num">7</div><div class="stat-sub">项目知识块</div></div></div>
+          <div class="card"><div class="card-bd"><div class="stat-label">L3 画像</div><div class="stat-value num">1</div><div class="stat-sub">长期模式</div></div></div>
+        </div>
+
+        <div class="split">
+          <div class="tbl">
+            <div class="thead t-mem"><span>来源</span><span>内容</span><span class="cell num">分数</span><span class="cell num">时间</span><span>状态</span></div>
+            <div class="trow t-mem"><span class="cell"><span class="badge accent">dsh</span></span><span class="cell">Hermes 的 mem0 已于 11-02 停用，自动记忆回到内置 MEMORY.md</span><span class="cell num num">0.82</span><span class="cell num num">11-10</span><span class="cell"><span class="badge ok">有效</span></span></div>
+            <div class="trow t-mem"><span class="cell"><span class="badge accent">hermes</span></span><span class="cell">DSH 的 write 工具在 D: 盘会 EISDIR（exFAT 不支持硬链接）</span><span class="cell num num">0.79</span><span class="cell num num">11-09</span><span class="cell"><span class="badge ok">有效</span></span></div>
+            <div class="trow t-mem"><span class="cell"><span class="badge accent">pi</span></span><span class="cell">pi 的运行时配置是 models.json，不是 models-store.json</span><span class="cell num num">0.77</span><span class="cell num num">11-10</span><span class="cell"><span class="badge ok">有效</span></span></div>
+            <div class="trow t-mem"><span class="cell"><span class="badge accent">dsh</span></span><span class="cell">mnemon supersedes 边不参与召回排序，必须物理取代</span><span class="cell num num">0.74</span><span class="cell num num">11-02</span><span class="cell"><span class="badge warn">已取代</span></span></div>
+            <div class="trow t-mem"><span class="cell"><span class="badge accent">workbuddy</span></span><span class="cell">WorkBuddy 无头调用需显式 --model custom-local:&lt;id&gt;</span><span class="cell num num">0.71</span><span class="cell num num">10-29</span><span class="cell"><span class="badge ok">有效</span></span></div>
+            <div class="trow t-mem"><span class="cell"><span class="badge accent">hermes</span></span><span class="cell">Telegram 适配器阻塞事件循环导致 gateway exit 75</span><span class="cell num num">0.68</span><span class="cell num num">10-09</span><span class="cell"><span class="badge ok">有效</span></span></div>
+          </div>
+
+          <div class="card">
+            <div class="card-hd"><span>详情</span><span class="spacer"></span><span class="muted">L1 · pi</span></div>
+            <div class="card-bd">
+              <div style="font-size:14px;line-height:22px">pi 的运行时配置是 <b>models.json</b>，不是 <code>models-store.json</code>（后者是模型目录缓存，改了不生效）。</div>
+              <div class="kv">
+                <span class="k">来源</span><span>pi · session-8f3a</span>
+                <span class="k">双时态</span><span>2026-11-10 生效 · 仍有效</span>
+                <span class="k">重要度</span><span class="num">4 / 5</span>
+                <span class="k">访问</span><span class="num">3 次</span>
+                <span class="k">状态</span><span>未 pin</span>
+              </div>
+<pre>agent:      "pi"
+layer:      "L1"
+confidence: 0.91
+valid_from: "2026-11-10T05:12:00Z"
+pinned:     false</pre>
+              <div class="flex mt12"><button class="btn sm">编辑</button><button class="btn sm">Pin</button><button class="btn sm danger">删除</button></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 维护 ================= -->
+      <section id="page-maintain" class="hidden">
+        <div class="ph">
+          <div><h1>维护</h1><div class="desc">体检 20 通过 · 3 注意 · 0 失败 · 上次 11-09 18:20</div></div>
+          <div class="acts"><button class="btn primary">立即体检</button></div>
+        </div>
+
+        <div class="g4">
+          <div class="card"><div class="card-bd"><div class="stat-label">FAMA 遗忘分</div><div class="stat-value num" style="color:var(--danger-text)">0.13</div><div class="stat-sub">目标 ≥ 0.80</div></div></div>
+          <div class="card"><div class="card-bd"><div class="stat-label">冲突</div><div class="stat-value num" style="color:var(--warn-text)">7</div><div class="stat-sub">2 条旧值压新值</div></div></div>
+          <div class="card"><div class="card-bd"><div class="stat-label">重复</div><div class="stat-value num">3</div><div class="stat-sub">余弦 ≥ 0.85</div></div></div>
+          <div class="card"><div class="card-bd"><div class="stat-label">审计链</div><div class="stat-value" style="color:var(--ok-text);font-size:26px;line-height:44px">完整</div><div class="stat-sub">744 条 · 0 断裂</div></div></div>
+        </div>
+
+        <div class="split">
+          <div class="card">
+            <div class="card-hd"><span>体检项</span><span class="spacer"></span><span class="muted">23 项</span></div>
+            <div class="checks">
+              <div class="chk"><span class="led ok"></span><span class="n">归属完整性（agent 标签）</span><span class="v num">95.1%</span></div>
+              <div class="chk"><span class="led warn"></span><span class="n">来源溯源（session_id）</span><span class="v num">0% · 待补</span></div>
+              <div class="chk"><span class="led ok"></span><span class="n">嵌入覆盖（1024 维）</span><span class="v num">185 / 185</span></div>
+              <div class="chk"><span class="led ok"></span><span class="n">备份新鲜度</span><span class="v">2 小时前</span></div>
+              <div class="chk"><span class="led ok"></span><span class="n">审计链完整性</span><span class="v num">744 条</span></div>
+              <div class="chk"><span class="led waived"></span><span class="n">生产库 FAMA</span><span class="v">无受控样本</span></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-hd"><span>冲突收件箱</span><span class="spacer"></span><span class="muted">7 条</span></div>
+            <div class="card-bd">
+              <div class="cfs">
+                <div class="cf old"><div class="lb">旧值 · 10-15 · dsh</div>部署端口是 8080</div>
+                <div class="cf"><div class="lb">新值 · 11-02 · hermes</div>部署端口是 9090</div>
+              </div>
+              <div class="flex"><button class="btn primary sm">采纳新值</button><button class="btn sm">保留旧值</button><button class="btn sm ghost">稍后</button></div>
+              <div class="stat-sub mt12">删除前显示影响面：影响 3 个实体、2 条关系。</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 设置 ================= -->
+      <section id="page-settings" class="hidden">
+        <div class="ph"><div><h1>设置</h1><div class="desc">6 组 · 页内搜索 · 改坏可回滚</div></div></div>
+        <div class="card"><div class="card-bd">
+          <div class="empty"><b>设置页在下一稿细化</b>左侧 6 组（通用 / Agent 接入 / 记忆与存储 / 模型与检索 / 数据与备份 / 关于），组内小标题 + 顶部页内搜索。</div>
+        </div></div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script>
+document.querySelectorAll('.item[data-page]').forEach(el=>{
+  el.addEventListener('click',()=>{
+    document.querySelectorAll('.item[data-page]').forEach(x=>x.classList.remove('active'));
+    el.classList.add('active');
+    ['connect','memory','maintain','settings'].forEach(p=>document.getElementById('page-'+p).classList.add('hidden'));
+    document.getElementById('page-'+el.dataset.page).classList.remove('hidden');
+  });
+});
+</script>
+</body>
+</html>
+
+

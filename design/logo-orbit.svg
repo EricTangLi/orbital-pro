@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-label="Agent Memory Hub">
+  <title>Agent Memory Hub</title>
+  <defs>
+    <linearGradient id="amhBrand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6366F1"/>
+      <stop offset="1" stop-color="#4F46E5"/>
+    </linearGradient>
+  </defs>
+  <!-- 22% 圆角的应用图标底 -->
+  <rect width="1024" height="1024" rx="226" fill="url(#amhBrand)"/>
+  <!-- 中心核：中枢 -->
+  <circle cx="512" cy="512" r="96" fill="#FFFFFF"/>
+  <!-- 环绕弧：记忆层，开口朝右上 -->
+  <path d="M512 300 A212 212 0 1 0 724 512" fill="none" stroke="#FFFFFF" stroke-width="52" stroke-linecap="round"/>
+</svg>

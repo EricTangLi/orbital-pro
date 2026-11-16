@@ -1,0 +1,1111 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>忆核 Orbital · 界面重构 demo（当前 / 改版后 对比）</title>
+<meta name="description" content="忆核 Orbital 总览页的两种视觉方案并排对比：当前线上设计与按 Geist、Linear 规范收敛后的改版。用真实数据（50 条记忆、4 个 agent、7 天趋势）。">
+<style>
+/* ============================================================
+   忆核 Orbital · 界面重构 demo
+   用途：给用户看「当前设计」与「改版后」的差异，确认方向
+   数据：全部取自真实库（50 条记忆 / 4 个 agent / 3 进程 / 7 天趋势）
+   ============================================================ */
+
+/* ---------- 字体（自托管，不引 Google Fonts） ---------- */
+@font-face {
+  font-family: "Inter Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2") format("woff2-variations");
+}
+
+/* ============================================================
+   设计令牌
+   默认值 = 当前线上设计；.mode-new 覆盖 = 改版建议
+   所有颜色都走这里，页面里不写字面色值
+   ============================================================ */
+:root {
+  /* 中性色阶（Radix gray） */
+  --gray-1: #fcfcfd;
+  --gray-2: #f9f9fb;
+  --gray-3: #f0f0f3;
+  --gray-4: #e8e8ec;
+  --gray-6: #d9d9e0;
+  --gray-9: #8b8d98;
+  --gray-11: #60646c;
+  --gray-12: #1c2024;
+
+  /* 纯白替身：gate 7b 要求基底向锚点色相微调，不用 #fff */
+  --white-card: #fefeff;
+  /* 今日新增的明度蒙版（不引入新色相） */
+  --veil: rgba(0, 0, 0, 0.22);
+  /* 字体族 */
+  --font-ui: "Inter Variable", "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Consolas, monospace;
+  /* agent 身份色（数据系列，顺序固定） */
+  --agent-dsh: #5b5bd6;
+  --agent-hermes: #d6409f;
+  --agent-pi: #8e4ec6;
+  --agent-workbuddy: #00a2c7;
+  /* 阴影基色 */
+  --shadow-tint: 0, 0, 0;
+  --indigo-3: #f0f1fe;
+  --indigo-9: #5b5bd6;
+  --green-3: #e6f6eb;
+  --green-11: #218358;
+  --amber-3: #fff7c2;
+  --amber-11: #4f3422;
+  --red-3: #feebec;
+  --red-11: #ce2c31;
+
+  /* 语义别名：当前设计 */
+  --bg-page: var(--gray-1);
+  --bg-card: var(--white-card);
+  --bg-sunken: var(--gray-3);
+  --bg-hover: var(--gray-4);
+  --border: var(--gray-6);
+  --text-1: var(--gray-12);
+  --text-2: var(--gray-11);
+  --text-3: var(--gray-9);
+  --accent: var(--indigo-9);
+  --accent-soft: var(--indigo-3);
+  --ok: var(--green-11);
+  --ok-soft: var(--green-3);
+  --warn: var(--amber-11);
+  --warn-soft: var(--amber-3);
+  --danger: var(--red-11);
+
+  /* 字号：当前 7 档（含两档同值） */
+  --fs-2xs: 11px;
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-md: 13px;
+  --fs-lg: 15px;
+  --fs-xl: 18px;
+  --fs-num: 21px;
+
+  /* 字重：当前 3 档 */
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+
+  /* 圆角 / 间距 */
+  --r-control: 4px;
+  --r-card: 6px;
+  --r-pill: 9999px;
+  --r-bar: 2px;
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+
+  --lh-body: 1.55;
+  --lh-tight: 1.35;
+  --tracking-title: normal;
+
+  /* 材质：当前只有 2 档 */
+  --shadow-card: 0 1px 2px rgba(28, 32, 36, 0.04);
+  --shadow-overlay: 0 8px 24px rgba(28, 32, 36, 0.12);
+
+  /* 动效：当前几乎没有 */
+  --dur: 0ms;
+  --ease: linear;
+
+  --sidebar-w: 220px;
+  --content-max: 1160px;
+  --page-pad: 24px;
+}
+
+/* ---------- 改版后的覆盖 ---------- */
+body.mode-new {
+  /* 1. 配色：卡片比页面亮，边框退到 gray-4 */
+  --bg-page: var(--gray-2);
+  --bg-card: var(--gray-1);
+  --border: var(--gray-4);
+
+  /* 2. 字重：510 / 590（Inter Variable 的中间档） */
+  --fw-medium: 510;
+  --fw-semibold: 590;
+
+  /* 3. 字号：删掉重复的 --fs-md，正文统一 13 */
+  --fs-md: 13px;
+
+  /* 4. 形状：卡片 8，徽章 pill */
+  --r-card: 8px;
+
+  /* 5. 材质：4 档 elevation */
+  --shadow-card: 0 1px 2px rgba(var(--shadow-tint), 0.04);
+  --shadow-raised: 0 4px 8px rgba(var(--shadow-tint), 0.06);
+  --shadow-overlay: 0 8px 24px rgba(var(--shadow-tint), 0.1);
+
+  /* 6. 动效：120ms 交互反馈 */
+  --dur: 120ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* 7. 布局：内容宽度与行高 */
+  --content-max: 1400px;
+  --lh-body: 1.5;
+  --tracking-title: -0.02em;
+}
+
+/* ============================================================
+   基础与浏览器原生表面（选中色 / 滚动条 / 焦点环）
+   ============================================================ */
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  /* 窄屏不出现横向滚动（gate 34） */
+  overflow-x: clip;
+}
+
+body {
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+  line-height: var(--lh-body);
+  color: var(--text-1);
+  background: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--text-1);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-control);
+}
+
+/* 自定义滚动条（默认滚动条不属于任何设计系统） */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--gray-4);
+  border-radius: var(--r-pill);
+  border: 2px solid var(--bg-page);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--gray-6); }
+
+/* 数字用表格数字，保证列对齐 */
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* ============================================================
+   顶栏（含模式切换）
+   ============================================================ */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-3) var(--sp-5);
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-lg);
+  letter-spacing: var(--tracking-title);
+}
+
+.brand-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  position: relative;
+}
+.brand-dot::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.spacer { margin-left: auto; }
+
+/* 分段控件（模式切换） */
+.segmented {
+  display: inline-flex;
+  padding: 4px;
+  gap: 2px;
+  background: var(--bg-sunken);
+  border-radius: var(--r-pill);
+}
+
+.segmented button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--text-2);
+  font: inherit;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  padding: 8px 16px;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+.segmented button:hover { color: var(--text-1); }
+
+.segmented button[aria-pressed="true"] {
+  background: var(--bg-card);
+  color: var(--text-1);
+  box-shadow: var(--shadow-card);
+}
+
+/* ============================================================
+   布局：侧栏 + 主区
+   ============================================================ */
+.shell {
+  display: flex;
+  min-height: calc(100vh - 57px);
+}
+
+.side {
+  flex: 0 0 var(--sidebar-w);
+  width: var(--sidebar-w);
+  padding: var(--sp-4) var(--sp-3);
+  border-right: 1px solid var(--border);
+  background: var(--bg-card);
+  transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+
+.side-group + .side-group { margin-top: var(--sp-5); }
+
+.side-label {
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-medium);
+  color: var(--text-3);
+  padding: 0 var(--sp-2);
+  margin-bottom: var(--sp-2);
+}
+
+.side-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  width: 100%;
+  padding: 8px var(--sp-2);
+  border: 0;
+  border-radius: var(--r-control);
+  background: transparent;
+  color: var(--text-2);
+  font: inherit;
+  font-size: var(--fs-sm);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+.side-item:hover { background: var(--bg-hover); color: var(--text-1); }
+
+.side-item[aria-current="page"] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: var(--fw-medium);
+}
+
+.side-item .count {
+  margin-left: auto;
+  font-size: var(--fs-2xs);
+  color: var(--text-3);
+}
+
+.side-item .glyph {
+  width: 16px;
+  text-align: center;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+}
+.side-item[aria-current="page"] .glyph { color: var(--accent); }
+
+.main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.content {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--sp-5) var(--sp-5) var(--sp-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+/* ============================================================
+   页面头
+   ============================================================ */
+.page-head {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--sp-4);
+}
+
+/* 标题下方留白少于上方（checklist 第 3 条：标题上方空间多于下方） */
+.page-head h1 {
+  margin: 0;
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-title);
+  line-height: var(--lh-tight);
+  text-wrap: balance;
+}
+
+.page-head .lede {
+  margin: 4px 0 0;
+  font-size: var(--fs-xs);
+  color: var(--text-2);
+}
+
+.head-actions { margin-left: auto; display: flex; gap: var(--sp-2); }
+
+/* ============================================================
+   按钮
+   ============================================================ */
+.btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  background: var(--bg-card);
+  color: var(--text-1);
+  font: inherit;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+
+.btn:hover { background: var(--bg-hover); }
+
+/* 改版后才有的按下反馈 */
+body.mode-new .btn:active { transform: scale(0.98); }
+
+.btn-ghost { border-color: transparent; background: transparent; color: var(--text-2); }
+.btn-ghost:hover { background: var(--bg-hover); color: var(--text-1); }
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ============================================================
+   卡片
+   ============================================================ */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  padding: var(--sp-3);
+  transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+/* 改版后：卡片只留阴影，边框撤掉（Geist「每条边框只画一次」） */
+body.mode-new .card {
+  border-color: transparent;
+  box-shadow: var(--shadow-card);
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+}
+
+.card-head .hint {
+  margin-left: auto;
+  font-size: var(--fs-2xs);
+  color: var(--text-3);
+  font-weight: var(--fw-normal);
+}
+
+/* ============================================================
+   指标行
+   ============================================================ */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-2);
+}
+
+.stat {
+  display: block;
+  white-space: nowrap;
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  background: var(--bg-card);
+  padding: var(--sp-3);
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+/* 当前设计：整块染语义色 */
+.stat.is-ok { background: var(--ok-soft); border-color: var(--ok-soft); }
+.stat.is-warn { background: var(--warn-soft); border-color: var(--warn-soft); }
+
+.stat:hover { box-shadow: var(--shadow-card); }
+body.mode-new .stat:hover { box-shadow: var(--shadow-raised); }
+body.mode-new .stat:active { transform: scale(0.995); }
+
+/* 改版后：背景一律中性，语义色只给数字 */
+body.mode-new .stat.is-ok,
+body.mode-new .stat.is-warn {
+  background: var(--bg-card);
+  border-color: transparent;
+  box-shadow: var(--shadow-card);
+}
+
+.stat-value {
+  font-size: var(--fs-num);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--text-1);
+}
+
+body.mode-new .stat.is-ok .stat-value { color: var(--ok); }
+body.mode-new .stat.is-warn .stat-value { color: var(--danger); }
+
+.stat-label {
+  margin-top: 2px;
+  font-size: var(--fs-2xs);
+  color: var(--text-2);
+}
+
+.stat-sub {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-2xs);
+  color: var(--text-3);
+}
+
+/* 微进度条 */
+.stat-progress {
+  margin-top: var(--sp-2);
+  height: 3px;
+  border-radius: var(--r-bar);
+  background: var(--bg-sunken);
+  overflow: hidden;
+}
+
+.stat-progress i {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-bar);
+  background: var(--accent);
+}
+
+body.mode-new .stat.is-ok .stat-progress i { background: var(--ok); }
+body.mode-new .stat.is-warn .stat-progress i { background: var(--danger); }
+
+/* ============================================================
+   两栏
+   ============================================================ */
+.two-col {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--sp-3);
+}
+
+/* 条形行：长度编码数值，单色（ADR-033） */
+.bar-row {
+  display: grid;
+  grid-template-columns: 16px 96px minmax(0, 1fr) 48px 64px;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 8px 0;
+  font-size: var(--fs-sm);
+}
+
+.bar-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  justify-self: center;
+}
+
+.bar-track {
+  height: 6px;
+  border-radius: var(--r-bar);
+  background: var(--bg-sunken);
+  overflow: hidden;
+}
+
+.bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-bar);
+  background: var(--accent);
+}
+
+/* 今日新增：纯明度蒙版，不换色相 */
+.bar-today {
+  display: block;
+  height: 100%;
+  margin-left: auto;
+  background: var(--veil);
+}
+
+.bar-num { text-align: right; font-weight: var(--fw-medium); }
+.bar-meta { text-align: right; font-size: var(--fs-2xs); color: var(--text-3); }
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-2);
+  border-top: 1px solid var(--border);
+  font-size: var(--fs-2xs);
+  color: var(--text-3);
+}
+
+.legend i {
+  display: inline-block;
+  width: 12px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--accent);
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.legend .lg-muted { background: var(--gray-9); }
+
+/* ============================================================
+   分层条
+   ============================================================ */
+.layer {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) 72px;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 8px 0;
+  font-size: var(--fs-sm);
+}
+
+.layer-name b { font-weight: var(--fw-semibold); }
+.layer-name span { font-size: var(--fs-2xs); color: var(--text-3); margin-left: 4px; }
+
+.layer-track {
+  height: 6px;
+  border-radius: var(--r-bar);
+  background: var(--bg-sunken);
+  overflow: hidden;
+}
+
+.layer-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-bar);
+}
+
+.fill-l0 { background: var(--gray-9); }
+.fill-l1 { background: var(--accent); }
+
+.layer-val {
+  text-align: right;
+  font-weight: var(--fw-medium);
+}
+
+.layer.is-muted { opacity: 0.55; }
+
+.card-foot {
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-2);
+  border-top: 1px solid var(--border);
+  font-size: var(--fs-2xs);
+  color: var(--text-3);
+}
+
+/* ============================================================
+   趋势（单色柱，0 值不画）
+   ============================================================ */
+.trend {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--sp-3);
+  height: 104px;
+  padding-top: var(--sp-2);
+}
+
+.trend-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+}
+
+.trend-n {
+  font-size: var(--fs-2xs);
+  color: var(--text-3);
+  line-height: 1;
+  min-height: 12px;
+}
+
+.trend-track {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  /* 只留基线：0 值那天不能出现满块灰（ADR-033） */
+  border-bottom: 1px solid var(--border);
+}
+
+.trend-fill {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  background: var(--gray-9);
+  border-radius: var(--r-control) var(--r-control) 0 0;
+}
+
+body.mode-new .trend-fill { background: var(--accent); }
+
+.trend-day { font-size: var(--fs-2xs); color: var(--text-3); line-height: 1; }
+
+/* ============================================================
+   待办
+   ============================================================ */
+.todo-row {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: var(--sp-2) var(--sp-1);
+  margin: 0 calc(var(--sp-1) * -1);
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: var(--r-control);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: var(--fs-sm);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+
+.todo-row:last-child { border-bottom: 0; }
+.todo-row:hover:not(:disabled) { background: var(--bg-hover); }
+.todo-row:disabled { cursor: default; opacity: 0.5; }
+
+.todo-note { font-size: var(--fs-2xs); color: var(--text-3); }
+
+.todo-n {
+  font-weight: var(--fw-semibold);
+  color: var(--text-2);
+}
+
+/* 只有影响功能的才用语义色（ADR-033 规则 3） */
+.todo-n.is-alert { color: var(--danger); }
+
+/* ============================================================
+   徽章（改版后变 pill）
+   ============================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: var(--r-control);       /* 当前：小方块 */
+  border: 1px solid var(--border);
+  font-size: var(--fs-2xs);
+  color: var(--text-2);
+  background: var(--bg-card);
+}
+
+body.mode-new .badge {
+  border-radius: var(--r-pill);          /* 改版：胶囊 */
+  border-color: transparent;
+  padding: 2px 8px;
+  background: var(--bg-sunken);
+}
+
+/* ============================================================
+   变更说明（页面底部，方便一边看一边对照）
+   ============================================================ */
+.notes {
+  border-top: 1px solid var(--border);
+  padding-top: var(--sp-4);
+  margin-top: var(--sp-2);
+}
+
+.notes h2 {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-title);
+}
+
+.notes ol {
+  margin: 0;
+  padding-left: 1.25em;
+  font-size: var(--fs-xs);
+  color: var(--text-2);
+  line-height: 1.75;
+}
+
+.notes code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  background: var(--bg-sunken);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+/* ============================================================
+   响应式
+   ============================================================ */
+@media (max-width: 1100px) {
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .two-col { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 860px) {
+  .shell { flex-direction: column; }
+  .side {
+    flex: none;
+    width: 100%;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .side-group { display: flex; flex-wrap: wrap; gap: 4px; }
+  .side-label { width: 100%; }
+  .side-item { width: auto; }
+  .content { padding: var(--sp-4) var(--sp-4) var(--sp-6); }
+  .page-head { flex-wrap: wrap; }
+  .head-actions { margin-left: 0; }
+}
+
+@media (max-width: 560px) {
+  .stats { grid-template-columns: minmax(0, 1fr); }
+  .bar-row { grid-template-columns: 16px 76px minmax(0, 1fr) 40px; }
+  .bar-meta { display: none; }
+  .topbar { flex-wrap: wrap; }
+}
+
+/* ============================================================
+   动效礼仪：尊重系统设置
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body class="mode-current">
+
+<div class="topbar">
+  <div class="brand"><span class="brand-dot" aria-hidden="true"></span>忆核 Orbital</div>
+
+  <div class="spacer"></div>
+
+  <div class="segmented" role="group" aria-label="预览模式">
+    <button type="button" id="btn-current" aria-pressed="true">当前设计</button>
+    <button type="button" id="btn-new" aria-pressed="false">改版后</button>
+  </div>
+</div>
+
+<div class="shell">
+  <!-- 侧栏 -->
+  <aside class="side">
+    <div class="side-group">
+      <div class="side-label">Agents</div>
+      <button class="side-item" type="button"><span class="bar-dot" style="background:var(--agent-dsh)"></span>DSH<span class="count num">1</span></button>
+      <button class="side-item" type="button"><span class="bar-dot" style="background:var(--agent-hermes)"></span>Hermes<span class="count num">1</span></button>
+      <button class="side-item" type="button"><span class="bar-dot" style="background:var(--agent-pi)"></span>pi<span class="count num">1</span></button>
+      <button class="side-item" type="button"><span class="bar-dot" style="background:var(--agent-workbuddy)"></span>WorkBuddy<span class="count num">47</span></button>
+    </div>
+
+    <div class="side-group">
+      <div class="side-label">Memory</div>
+      <button class="side-item" type="button" aria-current="page">总览</button>
+      <button class="side-item" type="button">记忆<span class="count num">50</span></button>
+      <button class="side-item" type="button">连接</button>
+      <button class="side-item" type="button">维护<span class="count num">3</span></button>
+      <button class="side-item" type="button">状态</button>
+      <button class="side-item" type="button">设置</button>
+    </div>
+  </aside>
+
+  <!-- 主区 -->
+  <main class="main">
+    <div class="content">
+
+      <header class="page-head">
+        <div>
+          <h1>总览</h1>
+          <p class="lede">50 条记忆, 4/4 个 agent 在用, 今日 +47</p>
+        </div>
+        <div class="head-actions">
+          <button class="btn btn-ghost" type="button">刷新</button>
+          <button class="btn" type="button">看全部记忆</button>
+        </div>
+      </header>
+
+      <!-- 指标行 -->
+      <div class="stats">
+        <button class="stat is-ok" type="button">
+          <div class="stat-value num">50</div>
+          <div class="stat-label">记忆总数</div>
+          <div class="stat-progress"><i style="width:94%"></i></div>
+          <div class="stat-sub">今日 +47</div>
+        </button>
+
+        <button class="stat" type="button">
+          <div class="stat-value num">4/4</div>
+          <div class="stat-label">在用 agent</div>
+          <div class="stat-progress"><i style="width:100%"></i></div>
+          <div class="stat-sub">共写入 50 条</div>
+        </button>
+
+        <button class="stat" type="button">
+          <div class="stat-value num">3/3</div>
+          <div class="stat-label">进程健康</div>
+          <div class="stat-progress"><i style="width:100%"></i></div>
+          <div class="stat-sub">GUI + core + proxy</div>
+        </button>
+
+        <button class="stat is-warn" type="button">
+          <div class="stat-value num">3</div>
+          <div class="stat-label">待处理</div>
+          <div class="stat-sub">缺向量的记忆</div>
+        </button>
+      </div>
+
+      <!-- 两栏 -->
+      <div class="two-col">
+        <section class="card">
+          <div class="card-head">
+            谁在给我写
+            <span class="hint">条长按最大者归一</span>
+          </div>
+
+          <div class="bar-row">
+            <span class="bar-dot" style="background:var(--agent-dsh)"></span>
+            <span>DSH</span>
+            <span class="bar-track"><span class="bar-fill" style="width:2.1%"></span></span>
+            <span class="bar-num num">1</span>
+            <span class="bar-meta">18 小时前</span>
+          </div>
+
+          <div class="bar-row">
+            <span class="bar-dot" style="background:var(--agent-hermes)"></span>
+            <span>Hermes</span>
+            <span class="bar-track"><span class="bar-fill" style="width:2.1%"></span></span>
+            <span class="bar-num num">1</span>
+            <span class="bar-meta">18 小时前</span>
+          </div>
+
+          <div class="bar-row">
+            <span class="bar-dot" style="background:var(--agent-pi)"></span>
+            <span>pi</span>
+            <span class="bar-track"><span class="bar-fill" style="width:2.1%"></span></span>
+            <span class="bar-num num">1</span>
+            <span class="bar-meta">18 小时前</span>
+          </div>
+
+          <div class="bar-row">
+            <span class="bar-dot" style="background:var(--agent-workbuddy)"></span>
+            <span>WorkBuddy</span>
+            <span class="bar-track">
+              <span class="bar-fill" style="width:100%"><span class="bar-today" style="width:100%"></span></span>
+            </span>
+            <span class="bar-num num">47</span>
+            <span class="bar-meta">9 小时前</span>
+          </div>
+
+          <div class="legend">
+            <span><i aria-hidden="true"></i>今日新增</span>
+            <span><i class="lg-muted" aria-hidden="true"></i>历史</span>
+            <span style="margin-left:auto">合计 50 条</span>
+          </div>
+
+          <div class="card-foot">
+            依赖身份门控（ADR-005）：每个 agent 只能读自己私有的，共享的才互相可见。
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            记忆分层
+            <span class="hint">ADR-031：按表统计</span>
+          </div>
+
+          <div class="layer">
+            <div class="layer-name"><b>L0</b><span>原始对话</span></div>
+            <div class="layer-track"><span class="layer-fill fill-l0" style="width:0%"></span></div>
+            <div class="layer-val num">0</div>
+          </div>
+
+          <div class="layer">
+            <div class="layer-name"><b>L1</b><span>原子记忆</span></div>
+            <div class="layer-track"><span class="layer-fill fill-l1" style="width:100%"></span></div>
+            <div class="layer-val num">50</div>
+          </div>
+
+          <div class="layer is-muted">
+            <div class="layer-name"><b>L2</b><span>场景块</span></div>
+            <div class="layer-track"></div>
+            <div class="layer-val" style="font-size:var(--fs-2xs);color:var(--text-3)">M3 引入</div>
+          </div>
+
+          <div class="layer is-muted">
+            <div class="layer-name"><b>L3</b><span>用户画像</span></div>
+            <div class="layer-track"></div>
+            <div class="layer-val" style="font-size:var(--fs-2xs);color:var(--text-3)">建议不做</div>
+          </div>
+
+          <div class="card-foot">向量 47 条已算, 3 条待算, schema v2</div>
+        </section>
+      </div>
+
+      <!-- 趋势 -->
+      <section class="card">
+        <div class="card-head">
+          近 7 天写入
+          <span class="hint">合计 50 条</span>
+        </div>
+        <div class="trend">
+          <div class="trend-col"><span class="trend-n"></span><span class="trend-track"><span class="trend-fill" style="height:0%"></span></span><span class="trend-day">11-07</span></div>
+          <div class="trend-col"><span class="trend-n"></span><span class="trend-track"><span class="trend-fill" style="height:0%"></span></span><span class="trend-day">11-08</span></div>
+          <div class="trend-col"><span class="trend-n"></span><span class="trend-track"><span class="trend-fill" style="height:0%"></span></span><span class="trend-day">11-09</span></div>
+          <div class="trend-col"><span class="trend-n"></span><span class="trend-track"><span class="trend-fill" style="height:0%"></span></span><span class="trend-day">11-10</span></div>
+          <div class="trend-col"><span class="trend-n"></span><span class="trend-track"><span class="trend-fill" style="height:0%"></span></span><span class="trend-day">11-11</span></div>
+          <div class="trend-col"><span class="trend-n"></span><span class="trend-track"><span class="trend-fill" style="height:0%"></span></span><span class="trend-day">11-12</span></div>
+          <div class="trend-col"><span class="trend-n num">50</span><span class="trend-track"><span class="trend-fill" style="height:100%"></span></span><span class="trend-day">11-13</span></div>
+        </div>
+      </section>
+
+      <!-- 待办 -->
+      <section class="card">
+        <div class="card-head">
+          我该做什么
+          <span class="hint">点一行，记忆页按同一条件筛好</span>
+        </div>
+
+        <button class="todo-row" type="button">
+          <span>缺向量</span>
+          <span class="todo-note">语义召回用不上</span>
+          <span class="todo-n is-alert num">3</span>
+        </button>
+
+        <button class="todo-row" type="button" disabled>
+          <span>待抽取</span>
+          <span class="todo-note">conversations 表还没有待抽取记录</span>
+          <span class="todo-n num">0</span>
+        </button>
+
+        <button class="todo-row" type="button" disabled>
+          <span>重复内容</span>
+          <span class="todo-note">同 agent 同内容多条</span>
+          <span class="todo-n num">0</span>
+        </button>
+
+        <button class="todo-row" type="button">
+          <span>未打标签</span>
+          <span class="todo-note">按标签筛选会漏掉</span>
+          <span class="todo-n num">50</span>
+        </button>
+
+        <button class="todo-row" type="button">
+          <span>90 天未访问</span>
+          <span class="todo-note">遗忘候选</span>
+          <span class="todo-n num">50</span>
+        </button>
+      </section>
+
+      <!-- 变更说明 -->
+      <section class="notes">
+        <h2>这一版改了什么（切到「改版后」对照看）</h2>
+        <ol>
+          <li><strong>层级</strong>：卡片底从纯白改成 <code>gray-1</code>，页面底改成 <code>gray-2</code>，让卡片"浮"在页面之上；边框从 <code>gray-6</code> 退到 <code>gray-4</code>，改版后卡片干脆换成一层极轻阴影（Geist 的"每条边框只画一次"）。</li>
+          <li><strong>语义色收敛</strong>：指标卡不再整块染绿/染黄，背景一律中性，<strong>只把数字染色</strong>。彩色面积从约 20% 降到 5% 以内。</li>
+          <li><strong>字重</strong>：500/600 换成 Inter Variable 的 <code>510/590</code>。这是 Linear 的做法，强调"被感知但不被叫喊"。</li>
+          <li><strong>形状</strong>：卡片圆角 6 → 8；徽章从 4px 小方块改成胶囊；按钮 padding 回到 4 的倍数。</li>
+          <li><strong>材质</strong>：阴影分档（卡片 / 抬升 / 弹层），且一个元素只用一档；阴影全部纯黑透明，不加色。</li>
+          <li><strong>动效</strong>：所有交互反馈统一 120ms（按钮按下还有 <code>scale(0.98)</code> 的轻微下压）。当前版本是瞬移的。</li>
+          <li><strong>布局</strong>：内容最大宽 1160 → 1400；正文行高 1.55 → 1.5；标题加 <code>-0.02em</code> 负字距。</li>
+        </ol>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  var body = document.body;
+  var btnCurrent = document.getElementById("btn-current");
+  var btnNew = document.getElementById("btn-new");
+
+  function setMode(mode) {
+    var isNew = mode === "new";
+    body.classList.toggle("mode-new", isNew);
+    body.classList.toggle("mode-current", !isNew);
+    btnCurrent.setAttribute("aria-pressed", String(!isNew));
+    btnNew.setAttribute("aria-pressed", String(isNew));
+    // 深链接：方便把某一种模式直接发给别人看
+    try {
+      history.replaceState(null, "", isNew ? "#new" : "#current");
+    } catch (e) {
+      /* file:// 下可能被拒，忽略 */
+    }
+  }
+
+  btnCurrent.addEventListener("click", function () { setMode("current"); });
+  btnNew.addEventListener("click", function () { setMode("new"); });
+
+  // 键盘：按 1 / 2 也能切换（不干扰 Tab 导航）
+  document.addEventListener("keydown", function (e) {
+    if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    if (e.key === "1") setMode("current");
+    if (e.key === "2") setMode("new");
+  });
+
+  setMode(location.hash === "#new" ? "new" : "current");
+})();
+</script>
+</body>
+</html>

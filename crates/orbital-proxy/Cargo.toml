@@ -1,0 +1,22 @@
+[package]
+name = "orbital-proxy"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "orbital-proxy"
+path = "src/main.rs"
+
+[dependencies]
+orbital-core = { path = "../orbital-core" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+tokio = { workspace = true }
+axum = { workspace = true }
+reqwest = { version = "0.13.5", features = ["stream", "json"] }
+futures-util = "0.3.34"
+bytes = "1.12.1"

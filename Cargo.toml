@@ -1,0 +1,29 @@
+[workspace]
+resolver = "2"
+members = [
+  "crates/orbital-core",
+  "crates/orbital-mcp",
+  "crates/orbital-proxy",
+]
+
+[workspace.package]
+version = "0.94.9"
+edition = "2021"
+license = "MIT"
+rust-version = "1.90"
+
+[workspace.dependencies]
+# 版本口径：docs/10-技术栈选型.md（2026-11-12 实测 crates.io max_stable）
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+thiserror = "2.0.21"
+anyhow = "1.0.104"
+tracing = "0.1.44"
+tracing-subscriber = "0.3"
+# ADR-002：SQLite 必须 bundled（系统库 3.51.1 带 WAL-reset bug）
+rusqlite = { version = "0.42.0", features = ["bundled", "backup"] }
+tokio = { version = "1.54.1", features = ["rt-multi-thread", "macros", "net", "io-util", "sync", "time", "signal"] }
+axum = "0.8.9"
+# 内容指纹与 id 生成（writer 需要）
+sha2 = "0.11.1"
+uuid = { version = "1.29.2", features = ["v4"] }
