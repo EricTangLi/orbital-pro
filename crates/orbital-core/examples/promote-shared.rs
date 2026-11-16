@@ -24,8 +24,9 @@ fn main() {
     let db_path = &args[1];
     let journal = &args[2];
 
-    // 用本地所有者身份（等于"用户在 GUI 里点提升为共享"），不带 agent token
-    let va = orbital_core::identity::VerifiedAgent::for_local_owner("user".to_string());
+    // 用本地所有者身份（等于"用户在 GUI 里点提升为共享"），不带 agent token。
+    // 注意：真正用到身份的地方在下面的 `svc.update(&va, …)`，那里会按目标 agent 构造；
+    // 这里不需要额外的 `va` 变量（此前留了一个未使用变量，clippy 会报 unused-variable）。
 
     // 先按关键词挑候选（只读，用短命连接）
     let picked: Vec<(String, String, String)> = {

@@ -619,13 +619,6 @@ fn render_block_preview(agent: &str, limit: i64) -> String {
     format!("（索引最多 {limit} 条，agent={agent}）")
 }
 
-/// 时间戳（简单实现：用 SystemTime 的秒数，避免引 chrono）
-fn chrono_like_now() -> String {
-    use std::time::{SystemTime, UNIX_EPOCH};
-    let secs = SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0);
-    format!("unix:{secs}")
-}
-
 /// 把受控区块写入 MEMORY.md（原子写：temp + rename），**不碰区块外的用户内容**。
 ///
 /// T-M10-19（P0）：区块必须落在文件**开头**。原因：WorkBuddy 用户级 MEMORY.md 有 4,000

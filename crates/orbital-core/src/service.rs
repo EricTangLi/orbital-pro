@@ -92,7 +92,9 @@ fn cached_query_vec(
     use std::sync::{Mutex, OnceLock};
     use std::time::{Duration, Instant};
 
-    static CACHE: OnceLock<Mutex<HashMap<String, (Vec<Vec<f32>>, Instant)>>> = OnceLock::new();
+    // T-M10-49（CI clippy 1.100 暴露 type_complexity）：抽成别名，语义也更清楚
+    type QueryVecCache = OnceLock<Mutex<HashMap<String, (Vec<Vec<f32>>, Instant)>>>;
+    static CACHE: QueryVecCache = OnceLock::new();
     let cache = CACHE.get_or_init(|| Mutex::new(HashMap::new()));
     let key = format!("{}::{:?}", ep.base_url, texts);
 
@@ -936,9 +938,13 @@ impl MemoryService {
         let mut scored: Vec<RecallHit> = Vec::new();
         for r in rows {
             let (id, content, scope, blob) = r.map_err(map_err)?;
+            // T-M10-49（CI clippy 1.100 的 chunks_exact_to_as_chunks）：用 as_chunks
+            // 直接拿到 `&[u8; 4]`，省掉手工拼四字节，也避免未来版本再被 lint。
             let emb: Vec<f32> = blob
-                .chunks_exact(4)
-                .map(|c| f32::from_le_bytes([c[0], c[1], c[2], c[3]]))
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .map(|c| f32::from_le_bytes(*c))
                 .collect();
             let sim = crate::embed::cosine(&qvec, &emb) as f64;
             scored.push(RecallHit {
