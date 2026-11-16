@@ -76,6 +76,14 @@ fn drill_attach_on_copies_of_real_configs() {
         }
     }
     println!("drilled={drilled} skipped={skipped}");
-    assert!(drilled > 0, "至少演练一个配置文件（否则说明路径都没找到）");
+    if drilled == 0 {
+        // T-M10-49（CI 首跑暴露）：本用例在**干净环境**（CI runner / 新装机器）上必然
+        // 找不到任何真实 agent 配置 —— 这时没有可演练的对象，属"环境缺失"，不是代码缺陷。
+        // 旧实现硬断言 `drilled > 0`，导致公开仓库的 CI 永远红（注释写着"找不到就跳过"，
+        // 代码却没做到 —— 又是一处"注释说做了、代码没做"）。
+        // 本机有配置时 drilled > 0，仍会走上面的完整断言。
+        println!("SKIP: 未找到任何真实 agent 配置（干净环境），本用例跳过而不是失败");
+        return;
+    }
     let _ = std::fs::remove_dir_all(&tmp);
 }
