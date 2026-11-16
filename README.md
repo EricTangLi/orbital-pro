@@ -2,6 +2,7 @@
 
 > 一个给**多个 AI Agent 共用**的本地记忆中枢：记得住、找得到、管得动、忘得掉。
 
+[![CI](https://github.com/EricTangLi/orbital-pro/actions/workflows/ci.yml/badge.svg)](https://github.com/EricTangLi/orbital-pro/actions/workflows/ci.yml)
 ![version](https://img.shields.io/badge/version-0.94.9-blue)
 ![license](https://img.shields.io/badge/license-PolyForm--Noncommercial--1.0.0-orange)
 ![platform](https://img.shields.io/badge/platform-Windows%2010%2F11-lightgrey)
@@ -179,10 +180,6 @@ orbital-pro/
 | [`docs/07`](docs/07-架构决策记录.md) | **ADR 合集**（架构决策记录，至 ADR-055）：每条都有背景、被否方案、不许回退的理由 |
 | [`docs/09`](docs/09-踩坑与反模式.md) | 踩坑与反模式：真实踩过的坑，包括"注释说做了、代码没做" |
 | [`docs/34`](docs/34-用户指南.md) | 用户指南 |
-
-> 说明：`docs/` 中有 74 处结论引用 `evidence/`（开发过程的截图与实测日志）。
-> 为保护个人数据，`evidence/` **未随仓库公开**，因此这些相对链接在 GitHub 上会 404。
-> 结论本身可独立阅读；需要证据时请以文中描述、`docs/07` 的 ADR 与代码实现为准。
 
 ## 质量与测试
 
